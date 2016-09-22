@@ -1,5 +1,5 @@
 #Scraper for League of Nations Data
-#test git
+#useful - exec(open("./filename").read())
 
 import util
 import PyPDF2
@@ -50,7 +50,7 @@ link = test[0][5]
 
 
 def read_link(node):
-    neighbors = get_neighbors(limiting_domain)
+    #neighbors = get_neighbors(limiting_domain)
     #for url in neighbors:
     #if 'html' not in url:
     #pdfFile = open(url.split('/')[-1], 'w')
@@ -63,13 +63,13 @@ def read_link(node):
     #open_link = subprocess.Popen([node],shell=True)
 
 
-    response = urllib.urlopen(node)
-    file = open("document.pdf", 'wb')
-    file.write(response.read())
-    file.close()
-    print("Completed")
+    #response = urllib.urlopen(node)
+    #file = open("document.pdf", 'wb')
+    #file.write(response.read())
+    #file.close()
+    #print("Completed")
 
 
-    pdf = PyPDF2.PdfFileReader(open("test.pdf", "rb"))
+    pdf = PyPDF2.PdfFileReader(open("node", "rb"))
     for page in pdf.pages:
         print(page.extractText())
