@@ -24,8 +24,23 @@ for column_name in list(fdic_df):
 			new_name = new_name[:-1]
 		else:
 			break
+
 	new_column_header.append(new_name)
-fdic_df.columns = new_column_header
+
+#time to take care of this SUS issue once and for all 
+new_column_header_fixed = []
+for header in new_column_header:
+	if 'SUS' in header:
+		
+		header_parts  = header.split(" ")
+		new_header = "_".join(header_parts)
+		new_column_header_fixed.append(new_header)
+	else:
+		new_column_header_fixed.append(header)
+
+
+fdic_df.columns = new_column_header_fixed
+#print(new_column_header)
 
 new_column_header = []
 for column_name in list(agri_df):
@@ -38,12 +53,30 @@ fdic_df["id"] = fdic_df.index
 new_header_convert = set([])
 for column_header in list(fdic_df.columns):
 	if "FDIC" in column_header:
-		new = column_header.rsplit(" ", 1)
-		new_header_convert.add(new[0] + " ")
-print(new_header_convert)
+		#if " " not in column_header[-2:]:
+		if 'SUS' in column_header:
+			new = column_header.rsplit("_", 1)
+			new_header_convert.add(new[0] + "_")
+		else:
+			new = column_header.rsplit(" ", 1)
+			new_header_convert.add(new[0] + " ")
+		
+		
+		#print(new)
+print(list(new_header_convert))
+print(list(fdic_df.columns))
+
 fdic_df_long = pd.wide_to_long(fdic_df, list(new_header_convert), i = 'id', j = 'Year')
 
+#now I want to turn the indices, which are id and year, into their own columns
+fdic_df_long['Year'] = fdic_df_long.index.get_level_values('Year') 
+fdic_df_long['id'] = fdic_df_long.index.get_level_values('id') 
 
+#get rid of old year column -- check robustness of new year columns later, chance you did this wrong
+del fdic_df_long['YEAR']
+
+
+df = fdic_df_long
 #fdic_df.unstack()
 
 
