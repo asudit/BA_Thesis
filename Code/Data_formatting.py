@@ -1,5 +1,7 @@
 # for ease of use in interpreter: exec(open("/Users/Adam/Research/BA_Thesis/Code/Data_formatting.py").read())
 # general data notes: 
+import xlrd
+desired_regression_var = ['ID code','Year', 'County', 'Total value of products','bank_sus_norm' ,'Total HP', 'Wage earners by months, total', 'Cost of all materials and raw stock actually used', 'Branch or subsidiary of other firm']
 
 ICSPR_state_codes = {41 : 'ALABAMA',
 81 : 'ALASKA',
@@ -146,7 +148,39 @@ agri_df['State'] = agri_df['State'].apply(lambda x: str(x).lower())
 #rename FDIC county column header name; year headr names should already be uniform
 fdic_df_long=fdic_df_long.rename(columns = {'COUNTY NAME':'County', 'ICPR STATE CODE': 'State'})
 
-merged_df = pd.merge(agri_df, fdic_df_long, how='left', on=['Year', 'State', 'County'])
+fdic_df_long.reset_index(drop=True)
+fdic_df_long.set_index(['Year', 'State' ,'County'])
+agri_df.set_index(['Year', 'State' ,'County'])
+#I think inner worked better in terms of dropped observations
+merged_df = pd.merge(agri_df, fdic_df_long, how='inner', on=['Year', 'State', 'County'])
+#merged_df = pd.merge(agri_df, fdic_df_long, how='left', on=['Year', 'State', 'County'])
+
+def normalize_suspensions(row):
+	county = row['County']
+	state = row['State']
+	banks_sus = row['FDIC_BANKS_SUS_']
+	#print(banks_sus)
+	#banks_1929 = merged_df['FDIC BANKS '][(merged_df['Year'] == 1929) & (merged_df['County'] == county)]
+	banks_1929_list = list(merged_df.loc[(merged_df['Year'] == 1929) & (merged_df['County'] == county) & (merged_df['State'] == state), 'FDIC BANKS '])
+	#assert not isinstance(banks_1929_list, str)
+	if isinstance(banks_1929_list, str):
+		banks_1929 = banks_1929_list[0]
+	elif banks_1929_list == []:
+		banks_1929 = 1
+	else:
+		#print(banks_1929_list)
+		banks_1929 = banks_1929_list[0]
+
+	print(banks_1929_list)
+	
+	normalized = banks_sus/banks_1929
+
+	#print(normalized)
+	return normalized
+
+merged_df['bank_sus_norm'] = merged_df.apply(normalize_suspensions, axis = 1)
+
+#merged_df.groupby('ID code').first()
 
 # example check for merge: long[(long['County'] == 'kane') & (long['Year'] == 1929)]
 
@@ -155,15 +189,66 @@ merged_df = pd.merge(agri_df, fdic_df_long, how='left', on=['Year', 'State', 'Co
 
 # what's the damage
 
+################################################preliminary regression stuff ######################################################
+# adding plant size interaction -- maybe incorporated is a better way to go; try both
+def plant_size_interaction(row):
+	subsidiary = row['Branch or subsidiary of other firm']
+	#print(subsidiary)
+	if str(subsidiary) == 'yes':
+		big_plant = 1
+	else:
+		big_plant = 0
+	return big_plant
+merged_df['Branch or subsidiary of other firm'] = merged_df.apply(plant_size_interaction, axis =1)
+
+#adjust value added dependent variable via CPI, per year
+CPI_excel_path = '/Users/Adam/Research/BA_Thesis/Data/CPI Unadjusted,annual,index units.xls'
+xl = pd.ExcelFile(CPI_excel_path)
+cpi_df = xl.parse("FRED Graph")
+
+def normalize_valued_added(row):
+	year = row['Year']
+	cpi = cpi_df['CPI'][cpi_df['Year'] == year]
+	new_val_added = row['Total value of products']/cpi
+	new_cost_materials = row['Cost of all materials and raw stock actually used']/cpi
+	return new_val_added
+	
+def normalize_materials_cost(row):
+	year = row['Year']
+	cpi = cpi_df['CPI'][cpi_df['Year'] == year]
+	new_cost_materials = row['Cost of all materials and raw stock actually used']/cpi
+	return new_cost_materials
+merged_df['Total value of products'] = merged_df.apply(normalize_valued_added, axis =1)
+merged_df['Cost of all materials and raw stock actually used'] = merged_df.apply(normalize_materials_cost, axis =1)
+
+
+#now just create a new df with only variables you want for regression
+regression_df = merged_df[desired_regression_var]
+
+excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx'
+writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
+regression_df.to_excel(writer, 'Sheet1')
+writer.save()
+
+#first-differencing
+'''
+merged_df_diff = merged_df
+merged_df_diff.reset_index(drop=True)
+#merged_df_diff.astype('float64')
+merged_df_diff.set_index(['Year', 'ID code']).diff(-1)
+
+excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/preliminary_merge_differences.xlsx'
+writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
+merged_df_diff.to_excel(writer, 'Sheet1')
+writer.save()
+'''
+######################### write to excel #####
+'''
 excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx'
 writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
 merged_df.to_excel(writer, 'Sheet1')
 writer.save()
-
-
-################################################preliminary regression stuff ######################################################
-
-
+'''
 
 
 ####################### Some data visualization
