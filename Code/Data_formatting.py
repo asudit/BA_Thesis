@@ -1,9 +1,9 @@
 # for ease of use in interpreter: exec(open("/Users/Adam/Research/BA_Thesis/Code/Data_formatting.py").read())
 # general data notes: 
-import xlrd
-desired_regression_var = ['ID code','Year', 'County', 'Total value of products','bank_sus_norm', 'Post_1929' , 
+import xlrd, numpy as np
+desired_regression_var = ['ID code','Year', 'County','Open in 1929', 'Open in 1931', 'Open in 1933','Open in 1935','Total value of products','bank_sus_norm', 'Post_1929' , 
 'Total cost of materials, fuel, and electric cost(sum of f001, f002, f003)', 'Wage earners by months, total', 
-'Branch or subsidiary of other firm']
+'Branch or subsidiary of other firm', 'alt_iv', 'Balance year']
 
 ICSPR_state_codes = {41 : 'ALABAMA',
 81 : 'ALASKA',
@@ -160,8 +160,13 @@ merged_df = pd.merge(agri_df, fdic_df_long, how='inner', on=['Year', 'State', 'C
 #this follows the method of Nanda et al.
 aggregations = {'FDIC_BANKS_SUS_': 'sum' }
 sum_df = fdic_df_long[(fdic_df_long['Year'] == 1930) | (fdic_df_long['Year'] == 1931) | (fdic_df_long['Year'] == 1932) | (fdic_df_long['Year'] == 1933)].groupby('County').agg(aggregations)
+#sum_df = fdic_df_long[(fdic_df_long['Year'] == 1930) | (fdic_df_long['Year'] == 1931) | (fdic_df_long['Year'] == 1932) | (fdic_df_long['Year'] == 1933)].groupby(['State','County']).agg(aggregations)
 sum_df['County'] = sum_df.index.get_level_values('County') 
+#sum_df['County'] = sum_df.index.get_level_values('County') 
 sum_df.reset_index(drop=True)
+
+#take out inf values
+#merged_df.replace([np.inf, -np.inf], np.nan).dropna(subset=list(merged_df.columns), how="all")
 
 def normalize_suspensions(row):
 	county = row['County']
@@ -169,12 +174,6 @@ def normalize_suspensions(row):
 	
 	banks_sus = list(sum_df.loc[(sum_df['County'] == county), 'FDIC_BANKS_SUS_'])
 	banks_sus = banks_sus[0]
-
-	#print(banks_sus)
-
-	#for i in [1930, 1931, 1932 ,1933]:
-		#banks_sus_temp = list(fdic_df_long.loc[(fdic_df_long['Year'] == i) & (fdic_df_long['County'] == county) & (fdic_df_long['State'] == state),'FDIC_BANKS_SUS_'])
-		#banks_sus = banks_sus + banks_sus_temp[0]
 	
 	banks_1929_list = list(merged_df.loc[(merged_df['Year'] == 1929) & (merged_df['County'] == county) & (merged_df['State'] == state), 'FDIC BANKS '])
 
@@ -184,18 +183,39 @@ def normalize_suspensions(row):
 	elif banks_1929_list == []:
 		banks_1929 = 1
 	else:
-		#print(banks_1929_list)
+		
 		banks_1929 = banks_1929_list[0]
-
-	#print(banks_1929_list)
 	
 	normalized = float(banks_sus/banks_1929)
-	#print(normalized)
 
-	#print(normalized)
 	return normalized
 
 merged_df['bank_sus_norm'] = merged_df.apply(normalize_suspensions, axis = 1)
+
+def alt_iv(row):
+	county = row['County']
+	state = row['State']
+	year = row['Year']
+	banks_year = list(merged_df.loc[(merged_df['County'] == county) & (merged_df['Year'] == year), 'FDIC_BANKS_SUS_'])
+	banks_year = banks_year[0]
+
+	banks_1929_list = list(merged_df.loc[(merged_df['Year'] == 1929) & (merged_df['County'] == county) & (merged_df['State'] == state), 'FDIC BANKS '])
+
+	#assert not isinstance(banks_1929_list, str)
+	if isinstance(banks_1929_list, str):
+		banks_1929 = banks_1929_list[0]
+	elif banks_1929_list == []:
+		banks_1929 = 1
+	else:
+		banks_1929 = banks_1929_list[0]
+
+	alt_iv = float(banks_year/banks_1929)
+	#print(alt_iv)
+	return alt_iv
+merged_df['alt_iv'] = merged_df.apply(alt_iv, axis = 1)
+
+
+
 
 def create_post_29_var(row):
 	year = row['Year']
@@ -231,14 +251,15 @@ merged_df['Branch or subsidiary of other firm'] = merged_df.apply(plant_size_int
 #adjust value added dependent variable via CPI, per year
 CPI_excel_path = '/Users/Adam/Research/BA_Thesis/Data/CPI Unadjusted,annual,index units.xls'
 xl = pd.ExcelFile(CPI_excel_path)
-cpi_df = xl.parse("FRED Graph")
-cpi_df['Test'] = cpi_df['CPI'].apply(lambda x: x * 2)
+cpi_df = xl.parse("Sheet1")
+#cpi_df['Test'] = cpi_df['CPI'].apply(lambda x: x * 2)
+
 
 def normalize_valued_added(row):
 	year = row['Year']
 	cpi = cpi_df.loc[(cpi_df['Year'] == year), 'CPI']
-	new_val_added = row['Total value of products']/cpi
-	print(new_val_added)
+	new_val_added = float(row['Total value of products'])/float(cpi)
+	#print(new_val_added)
 	#print(cpi, new_val_added)
 	#new_cost_materials = row['Cost of all materials and raw stock actually used']/cpi
 	return new_val_added
@@ -246,14 +267,66 @@ def normalize_valued_added(row):
 def normalize_materials_cost(row):
 	year = row['Year']
 	cpi = cpi_df.loc[(cpi_df['Year'] == year), 'CPI']
-	new_cost_materials = row['Total cost of materials, fuel, and electric cost(sum of f001, f002, f003)']/cpi
+	new_cost_materials = float(row['Total cost of materials, fuel, and electric cost(sum of f001, f002, f003)'])/float(cpi)
 	return new_cost_materials
 merged_df['Total value of products'] = merged_df.apply(normalize_valued_added, axis =1)
 merged_df['Total cost of materials, fuel, and electric cost(sum of f001, f002, f003)'] = merged_df.apply(normalize_materials_cost, axis =1)
 
+########################## fill in blank rows with 0 ###############
 
+#merged_df.groupby('ID code')
+def balance_data(row):
+	open_29, open_31, open_33, open_35 = row['Open in 1929'], row['Open in 1931'], row['Open in 1933'], row['Open in 1935']
+	ind_list = [open_29, open_31, open_33, open_35]
+	year_list = ['1929', '1931', '1933', '1935']
+	first_year = '0'
+	for i in range(len(ind_list)):
+		if ind_list[i] == 1:
+			first_year = year_list[i]
+			break
+	return first_year
+			
+merged_df['Balance year'] = merged_df.apply(balance_data, axis =1)
+
+
+
+
+
+
+	
 #now just create a new df with only variables you want for regression
 regression_df = merged_df[desired_regression_var]
+
+def balance_data2(df):
+	new_rows = []
+	for index, row in df.iterrows():
+		years_needed = []
+		year = row['Year']
+		balance_year = row['Balance year']
+		year_list = ['1929', '1931', '1933', '1935']
+		open_29, open_31, open_33, open_35 = row['Open in 1929'], row['Open in 1931'], row['Open in 1933'], row['Open in 1935']
+		ind_list = [open_29, open_31, open_33, open_35]
+
+		if year == balance_year:
+			print('Yay')
+			for k in range(len(ind_list)):
+				if ind_list[k] == 0:
+					years_needed.append(year_list[k])
+			for j in years_needed:
+				new_rows.append([row['ID code'] , j, row['County'], open_29, open_31, open_33,open_35,0,0, 0, 0, 0, 0, 0, 0])
+	return new_rows
+
+#new_rows = balance_data2(regression_df)
+#df1 = pd.DataFrame(new_rows, columns = desired_regression_var)
+#regression_df.append(df1)
+
+'''
+excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx'
+writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
+merged_df.to_excel(writer, 'Sheet1')
+writer.save()
+'''
+
 '''
 excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx'
 writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
@@ -273,12 +346,9 @@ merged_df_diff.to_excel(writer, 'Sheet1')
 writer.save()
 '''
 ######################### write to excel #####
-'''
-excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx'
-writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
-merged_df.to_excel(writer, 'Sheet1')
-writer.save()
-'''
+
+
+
 
 
 ####################### Some data visualization
@@ -298,9 +368,61 @@ plt.show()
 '''
 
 
+'''
+	df_dict = {}
+	for index, row in df.iterrows():
+		year = row['Year']
+		#open_29, open_31, open_33, open_35 = row['Open in 1929'], row['Open in 1931'], row['Open in 1933'], row['Open in 1935']
+		id_code = row['ID code'] 
+		if id_code not in df_dict:
+			df_dict[id_code] = {}
+		df_dict[id_code][year] = row
+	keys = df_dict.keys()
+	for id_code in keys:
+		print(id_code)
+		year_list = ['1929', '1931', '1933', '1935']
+		for year in df_dict[id_code].keys():
+			old_row = df_dict[id_code][year]
+			if year in year_list:
+				year_list.remove(year)
+		for year in year_list:
+			
+			new_row = []
+			new_row.extend((id_code, year, old_row['County']))
+			for var in desired_regression_var[3:]:
+				new_row.append(0)
+			regression_df.loc[-1] = new_row
+			
 
 
+			#row1 = df_dict[id_code][year]
+			#row1
+	#return df_dict
+	'''
 
+'''
+	for k in range(len(year_list)):
+		if year_list[k] == year:
+			index = k
+	open_29, open_31, open_33, open_35 = row['Open in 1929'], row['Open in 1931'], row['Open in 1933'], row['Open in 1935']
+	ind_list = [open_29, open_31, open_33, open_35]
+	proceed = False
+	
+	if year_list[index] == year and ind_list[index] == 1:
+		proceed = True
+
+	#if year == '1929' and open_29 == 1:
+		#proceed = True
+	#elif year == '1931' and open_31 == 1:
+		#proceed = True
+	#elif year == '1933' and open_33 == 1:
+		#proceed = True
+	#elif year == '1935' and open_35 == 1:
+		#proceed = True
+	if proceed:
+		proceed2 = False
+		for i in range(len(ind_list)):
+	'''
 
 
 
