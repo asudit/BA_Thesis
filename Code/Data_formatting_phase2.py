@@ -30,6 +30,7 @@ def balance_data2(df):
 					years_needed.append(year_list[k])
 			for j in years_needed:
 				print('yay2?')
+				
 				new_rows.append([row['ID code'] , j, row['County'], open_29, open_31, open_33,open_35,0,0, 0, 0, 0, 0, 0, 0])
 	return new_rows
 
