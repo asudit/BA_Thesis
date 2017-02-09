@@ -142,7 +142,8 @@ for (i in 4:nrow(Panel)){
   }
 }
 
-fourth_diff <- lm(Panel$y_4diff ~ Post*var_interest + Panel$k_4diff + Panel$l_4diff -1 , data=Panel)
+#this regression is basically OLS, so I'll include an intercept
+fourth_diff <- lm(Panel$y_4diff ~ Post*var_interest + Panel$k_4diff + Panel$l_4diff , data=Panel)
 summary(fourth_diff)
 
 Panel_4diff <- data.frame(Panel$Year, Panel$ID.code, Panel$y_4diff, Panel$Total.value.of.products, Panel$l_4diff,Panel$Wage.earners.by.months..total,  Panel$k_4diff, 
