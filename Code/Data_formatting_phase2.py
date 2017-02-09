@@ -24,15 +24,23 @@ def balance_data2(df):
 		ind_list = [open_29, open_31, open_33, open_35]
 
 		if year == balance_year:
-			print('Yay')
+			#print('Yay')
 			for k in range(len(ind_list)):
 				if ind_list[k] == 0:
-					years_needed.append(year_list[k])
+					#years_needed.append(year_list[k])
+					years_needed.append(k)
 			for j in years_needed:
-				print('yay2?')
-				
-				new_rows.append([row['ID code'] , j, row['County'], open_29, open_31, open_33,open_35,0,0, 0, 0, 0, 0, 0, 0])
-	return new_rows
+				#print('yay2?')
+				#print(int(year_list[j]), int(balance_year))
+				if int(year_list[j]) < int(balance_year):
+					#print('cool')
+					new_rows.append([row['ID code'] , year_list[j], row['County'], open_29, open_31, open_33,open_35,'','', '', '', '', '', '', ''])
+					#print('cool')
+				if int(year_list[j]) > int(balance_year):
+					#print('sauce')
+					new_rows.append([row['ID code'] , year_list[j], row['County'], open_29, open_31, open_33,open_35,0,0, 0, 0, 0, 0, 0, 0])
+					#print('sauce')
+	return new_rows	
 
 new_rows = balance_data2(regression_df)
 df1 = pd.DataFrame(new_rows, columns = desired_regression_var)

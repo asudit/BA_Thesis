@@ -18,6 +18,7 @@ dup <- data.frame(duplicated(panel_elements))
 
 new_panel = data.frame(Panel, dup)
 Panel <- new_panel[new_panel$duplicated.panel_elements. == F,]
+Panel[Panel==''] <- NA
 #Panel1 <- group_by(Panel, 'Id.code')
 
 #Panel <- lapply(Panel, function(x) x[is.finite(x)])
@@ -28,23 +29,26 @@ Panel <- new_panel[new_panel$duplicated.panel_elements. == F,]
 #Panel$noInf <- aa
 #Panel <- Panel[Panel['noInf'] == T,]
 
-
+Panel$bank_sus_norm <- as.numeric(Panel$bank_sus_norm)
 var_interest <- Panel$bank_sus_norm
-var_interest <- as.numeric(var_interest)
+#var_interest <- as.numeric(var_interest)
 
 alt_iv = as.numeric(Panel$alt_iv)
-
+Panel$Total.value.of.products <- as.numeric(Panel$Total.value.of.products)
 val_added  <- Panel$Total.value.of.products
 ID <- Panel$ID.code
 Year <- Panel$Year
 county <- Panel$County
 subsidiary <- Panel$Branch.or.subsidiary.of.other.firm
 
+Panel$Wage.earners.by.months..total <- as.numeric(Panel$Wage.earners.by.months..total)
 labor <- Panel$Wage.earners.by.months..total
 #fixed_capital <- Panel$Total.HP
 #variable_capital <- Panel$Cost.of.all.materials.and.raw.stock.actually.used
+Panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003. <- as.numeric(Panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.)
 capital <- Panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.
 #Nanda gets the credit
+Panel$Post_1929<- as.numeric(Panel$Post_1929)
 Post <- Panel$Post_1929
 
 
