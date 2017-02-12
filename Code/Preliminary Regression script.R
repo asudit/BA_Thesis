@@ -8,6 +8,7 @@ library(dplyr)
 library(lazyeval) #for the group by function
 library(ggplot2)
 library(micEconCES)
+library(logistf)
 #Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx", 1)
 Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx", 1)
 CPI <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/CPI Unadjusted,annual,index units.xls")
@@ -64,6 +65,11 @@ fixed <- lm(val_added ~ Post*var_interest + labor + capital + factor(county) + f
 #fixed_alt_iv <- lm(val_added ~ Post*alt_iv + labor + capital + factor(county) + factor(Year) -1 , data=Panel)
 
 summary(fixed)
+
+library(clubSandwich)
+coef_test(fixed, vcov = "CR1", 
+          cluster = Panel$County, test = "naive-t")[1:2,]
+
 #summary(fixed_alt_iv)
 labor_elasticity <- lm(labor ~ var_interest)
 summary(labor_elasticity)
@@ -71,6 +77,8 @@ summary(labor_elasticity)
 #summary(cap_elasticity)
 #random <- plm(val_added ~ banks_sus_ratio + labor + capital, data=Panel, index=c('ID.code', 'Year'), model="random")
 
+
+###############################################################################################
 ########################## lagging code - first differences ##################
 Panel$ID.code <- as.factor(Panel$ID.code)
 
@@ -149,11 +157,116 @@ summary(fourth_diff)
 Panel_4diff <- data.frame(Panel$Year, Panel$ID.code, Panel$y_4diff, Panel$Total.value.of.products, Panel$l_4diff,Panel$Wage.earners.by.months..total,  Panel$k_4diff, 
                          Panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.)
 
-########### robustness check ##############
+########### probit ##############
+probit_panel <- subset(Panel , Panel$Open.in.1929 == 1)
+y_4diff <-probit_panel$Total.value.of.products -  lag(lag(lag(probit_panel$Total.value.of.products)))
+for (i in 4:nrow(probit_panel)){
+  if (probit_panel$ID.code[i]!=probit_panel$ID.code[i-3]) {
+    probit_panel$y_4diff[i] <- NA 
+  }
+}
+
+probit_panel$k_4diff <- probit_panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003. - 
+  lag(lag(lag(probit_panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.)))
+for (i in 4:nrow(probit_panel)){
+  if (probit_panel$ID.code[i]!=probit_panel$ID.code[i-3]) {
+    probit_panel$k_4diff[i] <- NA 
+  }
+}
+
+#Panel$l_diff <- lag(Panel$Wage.earners.by.months..total)
+probit_panel$l_4diff <- probit_panel$Wage.earners.by.months..total - lag(lag(lag(probit_panel$Wage.earners.by.months..total)))
+
+for (i in 4:nrow(probit_panel)){
+  if (probit_panel$ID.code[i]!=probit_panel$ID.code[i-3]) {
+    probit_panel$l_4diff[i] <- NA 
+  }
+}
+
+open_35 <- probit_panel$Open.in.1935
+val_added  <- probit_panel$Total.value.of.products
+var_interest <- probit_panel$bank_sus_norm
+
+Year <- probit_panel$Year
+county <- probit_panel$County
+
+labor <- probit_panel$Wage.earners.by.months..total
+capital <- probit_panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.
+
+Post <- probit_panel$Post_1929
+probit <- glm(open_35 ~ Post*var_interest, family=binomial(link="probit"), data=probit_panel)
+#probit <- glm(open_35 ~ Post*var_interest + probit_panel$l_4diff, family=binomial(link="probit"), data=probit_panel)
+probit_correction <- logistf(open_35 ~ Post*var_interest, data=probit_panel)
+summary(probit)
+
+#################main robustness check(s)#############################
+library(sqldf)
+Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx", 1)
+#Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx", 1)
+panel_elements <- Panel[c('Year', 'ID.code')]
+dup <- data.frame(duplicated(panel_elements))
+
+new_panel = data.frame(Panel, dup)
+Panel <- new_panel[new_panel$duplicated.panel_elements. == F,]
+Panel[Panel==''] <- NA
+
+Panel_33 <- Panel[(Panel$Year == '1933') ,]
+Panel_33['bank_sus_33'] <- Panel_33$FDIC_BANKS_SUS
+Panel_33 <-Panel_33[order(Panel_33$ID.code,Panel_33$Year),]
+Panel_35 <- Panel[(Panel$Year == '1935'),]
+Panel_35['bank_sus_35'] <- Panel_35$FDIC_BANKS_SUS
+Panel_35 <-Panel_35[order(Panel_35$ID.code,Panel_35$Year),]
+
+Panel_31 <- Panel[(Panel$Year == '1931') ,]
+Panel_31['bank_sus_31'] <- Panel_31$FDIC_BANKS_SUS
+Panel_31 <-Panel_31[order(Panel_31$ID.code,Panel_31$Year),]
+
+Panel_29 <- Panel[(Panel$Year == '1929') ,]
+Panel_29['bank_sus_29'] <- Panel_29$FDIC_BANKS_SUS
+Panel_29['banks'] <- Panel_29$FDIC_BANKS
+Panel_29 <-Panel_29[order(Panel_29$ID.code,Panel_29$Year),]
+Panel_29['capital'] <- Panel_29['Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.']
+Panel_29['labor'] <- Panel_29['Wage.earners.by.months..total']
+Panel_29['output'] <- Panel_29['Total.value.of.products']
+
+Panel_29['ID1'] <- Panel_29['ID.code']
+Panel_31['ID2'] <- Panel_31['ID.code']
+
+merged_29_31 <- sqldf('Select a.bank_sus_31, a.ID2 ,b.labor, b.capital,
+                    b.output, b.banks
+                    FROM Panel_31 AS a JOIN 
+                     Panel_29 AS b ON (a.ID2 = b.ID1)')
+robust_1 <- lm(merged_29_31$bank_sus_31 ~ merged_29_31$capital + merged_29_31$labor, data=merged_29_31)
+robust_2 <- lm(merged_29_31$bank_sus_31 ~ merged_29_31$output, data=merged_29_31$banks_sus_31)
+summary(robust_1)
+summary(robust_2)
+
+Panel_33['ID1'] <- Panel_33['ID.code']
+Panel_35['ID2'] <- Panel_35['ID.code']
+
+merged_29_33 <-sqldf('Select a.* ,b.bank_sus_33 
+                    FROM merged_29_31 AS a JOIN 
+                     Panel_33 AS b ON (a.ID2 = b.ID1)')
+
+merged_29_35 <- sqldf('Select a.* ,b.bank_sus_35 
+                    FROM merged_29_33 AS a JOIN 
+                     Panel_35 AS b ON (a.ID2 = b.ID2)')
+merged_29_35['bank_sus_31_35'] <- merged_29_35$bank_sus_31 + merged_29_35$bank_sus_33 + merged_29_35$bank_sus_35
+robust_3 <- lm(merged_29_35$bank_sus_31_35 ~ merged_29_35$capital + merged_29_35$labor, data=merged_29_35)
+robust_4 <- lm(merged_29_35$bank_sus_31_35 ~ merged_29_35$output, data=merged_29_35)
+summary(robust_3)
+summary(robust_4)
 
 
+#-----
+merged_33_35 <-sqldf('Select a.bank_sus_33, a.ID1 ,b.bank_sus_35, 
+                      FROM Panel_33 AS a JOIN 
+                     Panel_35 AS b ON (a.ID1 = b.ID2)')
+#merged_33_35 <- merge(x=data.frame(Panel_33$bank_sus_33, Panel_33$ID.code),y=data.frame(Panel_35$bank_sus_35, Panel_35$ID.code),by = 'ID.code')
 
-
+banks_sus <- Panel_33$bank_sus_norm + Panel_35$bank_sus_norm
+Panel_33_35<-Panel_33_35[order(Panel_33_35$ID.code,Panel_33_35$Year),]
+Panel_33
 
 
 #------
@@ -176,7 +289,6 @@ Panel_4diff <- data.frame(Panel$Year, Panel$ID.code, Panel$y_4diff, Panel$Total.
 #  group_by(factor(ID)) %>%
   #mutate(first_diff_capital = capital - lag(capital))
 
-#################main robustness check(s)######
 
 
 
@@ -227,6 +339,9 @@ se <- sqrt(diag(solve(crossprod(X)) %*% (t(uclust) %*% uclust) %*% solve(crosspr
 ggplot(Panel, aes(x=labor, y=val_added)) + geom_smooth(method='lm') + geom_point()
 #ggplot(Panel, aes(x=capital, y=val_added)) + geom_point()
 ggplot(Panel, aes(x=capital, y=val_added))  + geom_smooth(method='lm') + geom_point()
+ggplot(Panel, aes(x=var_interest, y=val_added))  + geom_smooth(method='lm') + geom_point()
+ggplot(Panel, aes(x=var_interest, y=labor))  + geom_smooth(method='lm') + geom_point()
+#hist(var_interest, val_added)
 
 #estimate ces production function using micro econ package
 cesData <- data.frame(l = labor, k = capital)
