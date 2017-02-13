@@ -63,18 +63,20 @@ Post <- Panel$Post_1929
 #Year <- as.factor(Year)
 fixed <- lm(val_added ~ Post*var_interest + labor + capital + factor(county) + factor(Year) -1 , data=Panel)
 #fixed_alt_iv <- lm(val_added ~ Post*alt_iv + labor + capital + factor(county) + factor(Year) -1 , data=Panel)
-
 summary(fixed)
 
-library(clubSandwich)
-coef_test(fixed, vcov = "CR1", 
-          cluster = Panel$County, test = "naive-t")[1:2,]
+#cluster standard errors
+library(sandwich)
+library(lmtest)
+library(multiwayvcov)
+vcov_year <- cluster.vcov(fixed, Panel$County) #adjust variance covariance matrix via clustering
+coeftest(fixed, vcov_year) # run t test on model, with clustering covar matrix
 
 #summary(fixed_alt_iv)
 labor_elasticity <- lm(labor ~ var_interest)
 summary(labor_elasticity)
-#cap_elasticity <- lm(capital ~ var_interest)
-#summary(cap_elasticity)
+cap_elasticity <- lm(capital ~ var_interest)
+summary(cap_elasticity)
 #random <- plm(val_added ~ banks_sus_ratio + labor + capital, data=Panel, index=c('ID.code', 'Year'), model="random")
 
 
@@ -157,7 +159,7 @@ summary(fourth_diff)
 Panel_4diff <- data.frame(Panel$Year, Panel$ID.code, Panel$y_4diff, Panel$Total.value.of.products, Panel$l_4diff,Panel$Wage.earners.by.months..total,  Panel$k_4diff, 
                          Panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.)
 
-########### probit ##############
+########### probit ###################################################
 probit_panel <- subset(Panel , Panel$Open.in.1929 == 1)
 y_4diff <-probit_panel$Total.value.of.products -  lag(lag(lag(probit_panel$Total.value.of.products)))
 for (i in 4:nrow(probit_panel)){
@@ -194,8 +196,9 @@ labor <- probit_panel$Wage.earners.by.months..total
 capital <- probit_panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.
 
 Post <- probit_panel$Post_1929
-probit <- glm(open_35 ~ Post*var_interest, family=binomial(link="probit"), data=probit_panel)
-#probit <- glm(open_35 ~ Post*var_interest + probit_panel$l_4diff, family=binomial(link="probit"), data=probit_panel)
+#probit <- glm(open_35 ~ Post*var_interest, family=binomial(link="probit"), data=probit_panel)
+probit <- glm(open_35 ~ Post*var_interest + probit_panel$l_4diff, family=binomial(link="probit"), data=probit_panel)
+logit <- glm(open_35 ~ Post*var_interest + probit_panel$l_4diff, family=binomial(link="logit"), data=probit_panel)
 probit_correction <- logistf(open_35 ~ Post*var_interest, data=probit_panel)
 summary(probit)
 
