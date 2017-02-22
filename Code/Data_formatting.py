@@ -63,8 +63,10 @@ from scipy.optimize import curve_fit
 
 fdic_data_path = '/Users/Adam/Research/BA_Thesis/Data/FDIC_first_conversion.dta'
 cotton_data_path = '/Users/Adam/Research/BA_Thesis/Data/Cotton_ICSPR.dta'
+auto_data_Path = "/Users/Adam/Research/BA_Thesis/Data/Automobile_ICSPR.dta"
 fdic_df = pd.read_stata(fdic_data_path)
 agri_df = pd.read_stata(cotton_data_path)
+auto_df = pd.read_stata(auto_data_path)
 
 #no duplicates
 agri_df.drop_duplicates()
@@ -159,9 +161,10 @@ merged_df = pd.merge(agri_df, fdic_df_long, how='inner', on=['Year', 'State', 'C
 
 #this follows the method of Nanda et al.
 aggregations = {'FDIC_BANKS_SUS_': 'sum' }
-sum_df = fdic_df_long[(fdic_df_long['Year'] == 1930) | (fdic_df_long['Year'] == 1931) | (fdic_df_long['Year'] == 1932) | (fdic_df_long['Year'] == 1933)].groupby('County').agg(aggregations)
+sum_df = fdic_df_long[(fdic_df_long['Year'] == 1930) | (fdic_df_long['Year'] == 1931) | (fdic_df_long['Year'] == 1932) | (fdic_df_long['Year'] == 1933)].groupby(['County', 'State']).agg(aggregations)
 #sum_df = fdic_df_long[(fdic_df_long['Year'] == 1930) | (fdic_df_long['Year'] == 1931) | (fdic_df_long['Year'] == 1932) | (fdic_df_long['Year'] == 1933)].groupby(['State','County']).agg(aggregations)
 sum_df['County'] = sum_df.index.get_level_values('County') 
+sum_df['State'] = sum_df.index.get_level_values('State') 
 #sum_df['County'] = sum_df.index.get_level_values('County') 
 sum_df.reset_index(drop=True)
 
@@ -172,7 +175,7 @@ def normalize_suspensions(row):
 	county = row['County']
 	state = row['State']
 	
-	banks_sus = list(sum_df.loc[(sum_df['County'] == county), 'FDIC_BANKS_SUS_'])
+	banks_sus = list(sum_df.loc[(sum_df['County'] == county) & (sum_df['State'] == state), 'FDIC_BANKS_SUS_'])
 	banks_sus = banks_sus[0]
 	
 	banks_1929_list = list(merged_df.loc[(merged_df['Year'] == 1929) & (merged_df['County'] == county) & (merged_df['State'] == state), 'FDIC BANKS '])
@@ -326,7 +329,6 @@ writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
 merged_df.to_excel(writer, 'Sheet1')
 writer.save()
 '''
-
 '''
 excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx'
 writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
@@ -345,6 +347,18 @@ writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
 merged_df_diff.to_excel(writer, 'Sheet1')
 writer.save()
 '''
+'''
+excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/FDIC_check.xlsx'
+writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
+fdic_df_long.to_excel(writer, 'Sheet1')
+writer.save()
+
+excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/FDIC_raw_check.xlsx'
+writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
+fdic_df.to_excel(writer, 'Sheet1')
+writer.save()
+'''
+
 ######################### write to excel #####
 
 
