@@ -86,6 +86,9 @@ vcov_year_alt <- cluster.vcov(fixed_alt_iv, Panel$County)
 fixed_robust <- coeftest(fixed, vcov_year)
 #run t test on model, with clustering covar matrix
 alt_iv_robust <- coeftest(fixed_alt_iv, vcov_year_alt)
+#just to check roughly the same
+coeftest(fixed_alt_iv, vcov=vcovHC(fixed_alt_iv,type="HC0",cluster="county"))
+#####
 summary(fixed_robust)
 
 #summary(fixed_alt_iv)
@@ -366,8 +369,10 @@ library(multiwayvcov)
 require(multiwayvcov)
 require(lmtest)
 
-vcov_year_pre <- cluster.vcov(fixed_2per_alt_iv, Panel_2per$County)
-fixed_2per_alt_iv_robust <- coeftest(fixed_2per_alt_iv, vcov_year_pre)
+#vcov_year_pre <- cluster.vcov(fixed_2per_alt_iv, Panel_2per$County)
+#fixed_2per_alt_iv_robust <- coeftest(fixed_2per_alt_iv, vcov_year_pre)
+#im giving up on getting vcov to work here. Results are almost the same for this method below
+coeftest(fixed_2per_alt_iv, vcov=vcovHC(fixed_2per_alt_iv,type="HC0",cluster="County"))
 #run t test on model, with clustering covar matrix
 
 
