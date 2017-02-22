@@ -9,7 +9,9 @@ library(lazyeval) #for the group by function
 library(ggplot2)
 library(micEconCES)
 library(logistf)
+library(stargazer)
 #Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx", 1)
+#Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/regression_var_auto.xlsx", 1)
 Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx", 1)
 CPI <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/CPI Unadjusted,annual,index units.xls")
 
@@ -20,6 +22,7 @@ dup <- data.frame(duplicated(panel_elements))
 new_panel = data.frame(Panel, dup)
 Panel <- new_panel[new_panel$duplicated.panel_elements. == F,]
 Panel[Panel==''] <- NA
+#Panel<-Panel[order(Panel$ID.code,Panel$Year),]
 #Panel1 <- group_by(Panel, 'Id.code')
 
 #Panel <- lapply(Panel, function(x) x[is.finite(x)])
@@ -51,6 +54,7 @@ capital <- Panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f
 #Nanda gets the credit
 Panel$Post_1929<- as.numeric(Panel$Post_1929)
 Post <- Panel$Post_1929
+industry <- Panel$Industry
 
 
 #issue -- the merge with FDIC did not work as well as hoped. lots of blanks
@@ -61,16 +65,28 @@ Post <- Panel$Post_1929
 #this is using my own fixed effects
 #county <-as.factor(county)
 #Year <- as.factor(Year)
-fixed <- lm(val_added ~ Post*var_interest + labor + capital + factor(county) + factor(Year) -1 , data=Panel)
-#fixed_alt_iv <- lm(val_added ~ Post*alt_iv + labor + capital + factor(county) + factor(Year) -1 , data=Panel)
+fixed <- lm(val_added ~ Post*var_interest + labor + capital + factor(county) + factor(Year)  -1 , data=Panel)
+fixed_alt_iv <- lm(val_added ~ Post*alt_iv + labor + capital + factor(county) + factor(Year) -1 , data=Panel)
 summary(fixed)
+summary(fixed_alt_iv)
+
+fixed_external <- lm(val_added ~ Post*var_interest + labor + capital + factor(county) + factor(Year) -1 + Panel$Branch.or.subsidiary.of.other.firm.1, data=Panel)
+summary(fixed_external)
 
 #cluster standard errors
 library(sandwich)
 library(lmtest)
 library(multiwayvcov)
+#cov1 <- vcovHC(fixed, type = "HC1")
+#robust_se1    <- sqrt(diag(cov1))
+#cov2 <- vcovHC(fixed_alt_iv, type = "HC1")
+#robust_se2    <- sqrt(diag(cov2))
 vcov_year <- cluster.vcov(fixed, Panel$County) #adjust variance covariance matrix via clustering
-coeftest(fixed, vcov_year) # run t test on model, with clustering covar matrix
+vcov_year_alt <- cluster.vcov(fixed_alt_iv, Panel$County)
+fixed_robust <- coeftest(fixed, vcov_year)
+#run t test on model, with clustering covar matrix
+alt_iv_robust <- coeftest(fixed_alt_iv, vcov_year_alt)
+summary(fixed_robust)
 
 #summary(fixed_alt_iv)
 labor_elasticity <- lm(labor ~ var_interest)
@@ -114,7 +130,8 @@ for (i in 2:nrow(Panel)){
   }
 }
 
-first_diff <- lm(Panel$y_diff ~ Post*var_interest + Panel$k_diff + Panel$l_diff + factor(county) + factor(Year) -1 , data=Panel)
+#first_diff <- lm(Panel$y_diff ~ Post*var_interest + Panel$k_diff + Panel$l_diff + factor(county) + factor(Year)  , data=Panel)
+first_diff <- lm(Panel$y_diff ~ Post*var_interest + Panel$k_diff + Panel$l_diff  , data=Panel)
 summary(first_diff)
 
 Panel_diff <- data.frame(Panel$y_diff, Panel$Total.value.of.products, Panel$l_diff,Panel$Wage.earners.by.months..total,  Panel$k_diff, 
@@ -152,6 +169,8 @@ for (i in 4:nrow(Panel)){
   }
 }
 
+#Post <- Panel$Post_1929
+#var_interest <- Panel$bank_sus_norm
 #this regression is basically OLS, so I'll include an intercept
 fourth_diff <- lm(Panel$y_4diff ~ Post*var_interest + Panel$k_4diff + Panel$l_4diff , data=Panel)
 summary(fourth_diff)
@@ -186,45 +205,67 @@ for (i in 4:nrow(probit_panel)){
 }
 
 open_35 <- probit_panel$Open.in.1935
-val_added  <- probit_panel$Total.value.of.products
-var_interest <- probit_panel$bank_sus_norm
+val_added_probit  <- probit_panel$Total.value.of.products
+var_interest_probit <- probit_panel$bank_sus_norm
 
 Year <- probit_panel$Year
 county <- probit_panel$County
 
-labor <- probit_panel$Wage.earners.by.months..total
-capital <- probit_panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.
+library(dplyr)
+labor_probit <- probit_panel$Wage.earners.by.months..total
+capital_probit <- probit_panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.
 
-Post <- probit_panel$Post_1929
+labor_diff_quintile <- ntile(probit_panel$l_4diff, 5) 
+capital_diff_quintile <- ntile(probit_panel$k_4diff, 5)
+
+probit_panel$labor <- labor
+probit_panel$capital <- capital
+probit_panel$labor_diff_quintile <- labor_diff_quintile
+probit_panel$capital_diff_quintile <- capital_diff_quintile
+
+labor_quintile <- ntile(labor, 5) 
+capital_quintile <- ntile(capital, 5) 
+
+
+Post_probit <- probit_panel$Post_1929
 #probit <- glm(open_35 ~ Post*var_interest, family=binomial(link="probit"), data=probit_panel)
-probit <- glm(open_35 ~ Post*var_interest + probit_panel$l_4diff, family=binomial(link="probit"), data=probit_panel)
-logit <- glm(open_35 ~ Post*var_interest + probit_panel$l_4diff, family=binomial(link="logit"), data=probit_panel)
-probit_correction <- logistf(open_35 ~ Post*var_interest, data=probit_panel)
-summary(probit)
+probit <- glm(open_35 ~ Post_probit*var_interest_probit + probit_panel$labor_diff_quintile + probit_panel$capital_diff_quintile, family=binomial(link="probit"), data=probit_panel)
+probit_no_error <- glm(open_35 ~ Post_probit*var_interest_probit + labor_probit + capital_probit, family=binomial(link="probit"), data=probit_panel)
+#logit <- glm(open_35 ~ Post*var_interest + probit_panel$l_4diff, family=binomial(link="logit"), data=probit_panel)
+#probit_correction <- logistf(open_35 ~ Post*var_interest, data=probit_panel)
+summary(probit_no_error)
 
+#cluster probit
+vcov_year_probit <- cluster.vcov(probit_no_error, probit_panel$County) #adjust variance covariance matrix via clustering
+probit_robust <- coeftest(probit_no_error, vcov_year_probit)
+
+summary(probit_no_error)
+
+vcov_year_probit <- cluster.vcov(probit_no_error, probit_panel$County) #adjust variance covariance matrix via clustering
+probit_robust <- coeftest(probit_no_error, vcov_year_probit)
 #################main robustness check(s)#############################
 library(sqldf)
-Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx", 1)
+Panel_robust <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx", 1)
 #Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx", 1)
-panel_elements <- Panel[c('Year', 'ID.code')]
+panel_elements <- Panel_robust[c('Year', 'ID.code')]
 dup <- data.frame(duplicated(panel_elements))
 
-new_panel = data.frame(Panel, dup)
-Panel <- new_panel[new_panel$duplicated.panel_elements. == F,]
+new_panel = data.frame(Panel_robust, dup)
+Panel_robust <- new_panel[new_panel$duplicated.panel_elements. == F,]
 Panel[Panel==''] <- NA
 
-Panel_33 <- Panel[(Panel$Year == '1933') ,]
+Panel_33 <- Panel_robust[(Panel_robust$Year == '1933') ,]
 Panel_33['bank_sus_33'] <- Panel_33$FDIC_BANKS_SUS
 Panel_33 <-Panel_33[order(Panel_33$ID.code,Panel_33$Year),]
-Panel_35 <- Panel[(Panel$Year == '1935'),]
+Panel_35 <- Panel_robust[(Panel_robust$Year == '1935'),]
 Panel_35['bank_sus_35'] <- Panel_35$FDIC_BANKS_SUS
 Panel_35 <-Panel_35[order(Panel_35$ID.code,Panel_35$Year),]
 
-Panel_31 <- Panel[(Panel$Year == '1931') ,]
+Panel_31 <- Panel_robust[(Panel_robust$Year == '1931') ,]
 Panel_31['bank_sus_31'] <- Panel_31$FDIC_BANKS_SUS
 Panel_31 <-Panel_31[order(Panel_31$ID.code,Panel_31$Year),]
 
-Panel_29 <- Panel[(Panel$Year == '1929') ,]
+Panel_29 <- Panel_robust[(Panel_robust$Year == '1929') ,]
 Panel_29['bank_sus_29'] <- Panel_29$FDIC_BANKS_SUS
 Panel_29['banks'] <- Panel_29$FDIC_BANKS
 Panel_29 <-Panel_29[order(Panel_29$ID.code,Panel_29$Year),]
@@ -248,17 +289,108 @@ Panel_33['ID1'] <- Panel_33['ID.code']
 Panel_35['ID2'] <- Panel_35['ID.code']
 
 merged_29_33 <-sqldf('Select a.* ,b.bank_sus_33 
-                    FROM merged_29_31 AS a JOIN 
+                    FROM merged_29_31 AS a left OUTER JOIN 
                      Panel_33 AS b ON (a.ID2 = b.ID1)')
 
 merged_29_35 <- sqldf('Select a.* ,b.bank_sus_35 
-                    FROM merged_29_33 AS a JOIN 
+                    FROM merged_29_33 AS a left OUTER JOIN 
                      Panel_35 AS b ON (a.ID2 = b.ID2)')
 merged_29_35['bank_sus_31_35'] <- merged_29_35$bank_sus_31 + merged_29_35$bank_sus_33 + merged_29_35$bank_sus_35
 robust_3 <- lm(merged_29_35$bank_sus_31_35 ~ merged_29_35$capital + merged_29_35$labor, data=merged_29_35)
 robust_4 <- lm(merged_29_35$bank_sus_31_35 ~ merged_29_35$output, data=merged_29_35)
 summary(robust_3)
 summary(robust_4)
+
+
+#---aggregation of all observations after 1929, for simplicity############################################
+Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx", 1)
+#Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/regression_var_auto.xlsx", 1)
+CPI <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/CPI Unadjusted,annual,index units.xls")
+
+
+panel_elements <- Panel[c('Year', 'ID.code')]
+dup <- data.frame(duplicated(panel_elements))
+
+new_panel = data.frame(Panel, dup)
+Panel <- new_panel[new_panel$duplicated.panel_elements. == F,]
+Panel[Panel==''] <- NA
+
+Panel<-Panel[order(Panel$ID.code,Panel$Year),]
+Panel_post <- subset(Panel , Panel$Year != '1929')
+Panel_pre <-subset(Panel , Panel$Year == '1929')
+Panel_pre['ID'] <- Panel_pre$ID.code
+Panel_post['ID'] <- Panel_post$ID.code
+agg_columns <- cbind(Panel_post$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003., Panel_post$Total.value.of.products,
+                     Panel_post$Wage.earners.by.months..total, Panel_post$alt_iv)
+Panel_agg <- aggregate(agg_columns, by=list(ID=Panel_post$ID), FUN=sum)
+library(plyr)
+Panel_agg <- rename(Panel_agg, c("V1"="Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.", 
+                                 "V2"="Total.value.of.products", "V3"="Wage.earners.by.months..total", 
+                                 "V4"="alt_iv" ))
+
+#Panel_agg <- subset(Panel_agg,!duplicated(Panel_agg$ID))##
+library(sqldf)
+
+#this is the problem -- created 3 copies
+Panel_agg <- sqldf('Select DISTINCT a.*, b.bank_sus_norm ,b.County
+                    FROM Panel_agg AS a JOIN 
+                     Panel_post AS b ON (a.ID = b.ID)')
+Panel_agg['Post'] <- rep(1,nrow(Panel_agg))
+
+Panel_pre['Post'] <- rep(0,nrow(Panel_pre))
+
+Panel_2per <- rbind(Panel_pre[,c('ID',"Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.",
+                                      "Total.value.of.products", "Wage.earners.by.months..total",
+                                      'alt_iv',"bank_sus_norm", 'County','Post')], Panel_agg) 
+Panel_2per<-Panel_2per[order(Panel_2per$ID,Panel_2per$Post),]
+
+#sign of post*var_interest makes sense -- not so without interaction effect
+fixed_2per <- lm(Panel_2per$Total.value.of.products ~ Panel_2per$Post * Panel_2per$bank_sus_norm
+                 +  Panel_2per$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.
+                 + Panel_2per$Wage.earners.by.months..total + factor(Panel_2per$County) + Panel_2per$Post, 
+                 data = Panel_2per)
+summary(fixed_2per)
+
+Panel_2per$alt_iv <- as.numeric(Panel_2per$alt_iv)
+
+fixed_2per_alt_iv <- lm(Panel_2per$Total.value.of.products ~ Panel_2per$Post * Panel_2per$alt_iv
+                 +  Panel_2per$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.
+                 + Panel_2per$Wage.earners.by.months..total + factor(Panel_2per$County) -1, 
+                 data = Panel_2per)
+
+summary(fixed_2per_alt_iv)
+
+library(sandwich)
+library(lmtest)
+library(multiwayvcov)
+require(multiwayvcov)
+require(lmtest)
+
+vcov_year_pre <- cluster.vcov(fixed_2per_alt_iv, Panel_2per$County)
+fixed_2per_alt_iv_robust <- coeftest(fixed_2per_alt_iv, vcov_year_pre)
+#run t test on model, with clustering covar matrix
+
+
+
+
+
+#######make tables####
+table1 <- stargazer(fixed, fixed_robust,title="Fixed Characteristc IV", align=TRUE)
+table2 <-  stargazer(fixed_alt_iv, alt_iv_robust, title="Time-Varying IV", align=TRUE)
+table3 <- stargazer(probit_no_error, probit_robust, title="Probit Model", align=TRUE)
+table4 <- stargazer(first_diff, fourth_diff, title="Differenced Models", align=TRUE)
+table5 <- stargazer(robust_1, robust_2, title="Robustness Check 1", align=TRUE)
+table5 <- stargazer(robust_3, robust_4, title="Robustness Check 2", align=TRUE)
+
+
+
+
+
+
+
+
+
+
 
 
 #-----
