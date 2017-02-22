@@ -63,7 +63,7 @@ from scipy.optimize import curve_fit
 
 fdic_data_path = '/Users/Adam/Research/BA_Thesis/Data/FDIC_first_conversion.dta'
 cotton_data_path = '/Users/Adam/Research/BA_Thesis/Data/Cotton_ICSPR.dta'
-auto_data_Path = "/Users/Adam/Research/BA_Thesis/Data/Automobile_ICSPR.dta"
+auto_data_path = '/Users/Adam/Research/BA_Thesis/Data/Automobile_ICSPR.dta'
 fdic_df = pd.read_stata(fdic_data_path)
 agri_df = pd.read_stata(cotton_data_path)
 auto_df = pd.read_stata(auto_data_path)
@@ -71,12 +71,15 @@ auto_df = pd.read_stata(auto_data_path)
 #no duplicates
 agri_df.drop_duplicates()
 fdic_df.drop_duplicates()
+auto_df.drop_duplicates()
 
 #first, we need to rename the column headers for fdic data
 reader = pd.io.stata.StataReader(fdic_data_path)
 reader1 = pd.io.stata.StataReader(cotton_data_path)
+reader2 = pd.io.stata.StataReader(auto_data_path)
 label_dict = reader.variable_labels()
 label_dict1 = reader1.variable_labels()
+label_dict2=  reader2.variable_labels()
 
 new_column_header = []
 #need to make sure that the column headers end in a year
@@ -112,6 +115,11 @@ for column_name in list(agri_df):
 	new_column_header.append(label_dict1[column_name])
 agri_df.columns = new_column_header
 
+new_column_header = []
+for column_name in list(auto_df):
+	new_column_header.append(label_dict2[column_name])
+auto_df.columns = new_column_header
+
 #the agricultural census is in long format -- one observation corresponds to one year. We need to convert the fdic to long format
 
 fdic_df["id"] = fdic_df.index
@@ -125,6 +133,7 @@ for column_header in list(fdic_df.columns):
 		else:
 			new = column_header.rsplit(" ", 1)
 			new_header_convert.add(new[0] + " ")
+
 
 fdic_df_long = pd.wide_to_long(fdic_df, list(new_header_convert), i = 'id', j = 'Year')
 
@@ -149,14 +158,19 @@ fdic_df_long['COUNTY NAME'] = fdic_df_long['COUNTY NAME'].apply(lambda x: str(x)
 agri_df['County'] = agri_df['County'].apply(lambda x: str(x).lower())
 agri_df['State'] = agri_df['State'].apply(lambda x: str(x).lower())
 
+auto_df['County'] = auto_df['County'].apply(lambda x: str(x).lower())
+auto_df['State'] = auto_df['State'].apply(lambda x: str(x).lower())
+
 #rename FDIC county column header name; year headr names should already be uniform
 fdic_df_long=fdic_df_long.rename(columns = {'COUNTY NAME':'County', 'ICPR STATE CODE': 'State'})
 
 fdic_df_long.reset_index(drop=True)
 fdic_df_long.set_index(['Year', 'State' ,'County'])
 agri_df.set_index(['Year', 'State' ,'County'])
+auto_df.set_index(['Year', 'State' ,'County'])
 #I think inner worked better in terms of dropped observations
 merged_df = pd.merge(agri_df, fdic_df_long, how='inner', on=['Year', 'State', 'County'])
+merged_df_auto = pd.merge(auto_df, fdic_df_long, how='inner', on=['Year', 'State', 'County'])
 #merged_df = pd.merge(agri_df, fdic_df_long, how='left', on=['Year', 'State', 'County'])
 
 #this follows the method of Nanda et al.
@@ -199,7 +213,9 @@ def alt_iv(row):
 	county = row['County']
 	state = row['State']
 	year = row['Year']
-	banks_year = list(merged_df.loc[(merged_df['County'] == county) & (merged_df['Year'] == year), 'FDIC_BANKS_SUS_'])
+	banks_year = list(merged_df.loc[(merged_df['County'] == county) & (merged_df['Year'] == year) & (merged_df['State'] == state), 'FDIC_BANKS_SUS_'])
+	if banks_year == []:
+		banks_year = [0]
 	banks_year = banks_year[0]
 
 	banks_1929_list = list(merged_df.loc[(merged_df['Year'] == 1929) & (merged_df['County'] == county) & (merged_df['State'] == state), 'FDIC BANKS '])
@@ -217,6 +233,51 @@ def alt_iv(row):
 	return alt_iv
 merged_df['alt_iv'] = merged_df.apply(alt_iv, axis = 1)
 
+def normalize_suspensions_auto(row):
+	county = row['County']
+	state = row['State']
+	
+	banks_sus = list(sum_df.loc[(sum_df['County'] == county) & (sum_df['State'] == state), 'FDIC_BANKS_SUS_'])
+	banks_sus = banks_sus[0]
+	
+	banks_1929_list = list(merged_df_auto.loc[(merged_df_auto['Year'] == 1929) & (merged_df_auto['County'] == county) & (merged_df_auto['State'] == state), 'FDIC BANKS '])
+
+	#assert not isinstance(banks_1929_list, str)
+	if isinstance(banks_1929_list, str):
+		banks_1929 = banks_1929_list[0]
+	elif banks_1929_list == []:
+		banks_1929 = 1
+	else:
+		
+		banks_1929 = banks_1929_list[0]
+	
+	normalized = float(banks_sus/banks_1929)
+
+	return normalized
+
+merged_df_auto['bank_sus_norm'] = merged_df_auto.apply(normalize_suspensions_auto, axis = 1)
+
+def alt_iv_auto(row):
+	county = row['County']
+	state = row['State']
+	year = row['Year']
+	banks_year = list(merged_df_auto.loc[(merged_df_auto['County'] == county) & (merged_df_auto['Year'] == year)& (merged_df_auto['State'] == state), 'FDIC_BANKS_SUS_'])
+	banks_year = banks_year[0]
+
+	banks_1929_list = list(merged_df_auto.loc[(merged_df_auto['Year'] == 1929) & (merged_df_auto['County'] == county) & (merged_df_auto['State'] == state), 'FDIC BANKS '])
+
+	#assert not isinstance(banks_1929_list, str)
+	if isinstance(banks_1929_list, str):
+		banks_1929 = banks_1929_list[0]
+	elif banks_1929_list == []:
+		banks_1929 = 1
+	else:
+		banks_1929 = banks_1929_list[0]
+
+	alt_iv = float(banks_year/banks_1929)
+	#print(alt_iv)
+	return alt_iv
+merged_df_auto['alt_iv'] = merged_df_auto.apply(alt_iv, axis = 1)
 
 
 
@@ -229,6 +290,7 @@ def create_post_29_var(row):
 		post = 0
 	return post
 merged_df['Post_1929'] = merged_df.apply(create_post_29_var, axis = 1)
+merged_df_auto['Post_1929'] = merged_df_auto.apply(create_post_29_var, axis = 1)
 
 #merged_df.groupby('ID code').first()
 
@@ -250,6 +312,9 @@ def plant_size_interaction(row):
 		big_plant = 0
 	return big_plant
 merged_df['Branch or subsidiary of other firm'] = merged_df.apply(plant_size_interaction, axis =1)
+merged_df_auto['Branch or subsidiary of other firm'] = merged_df_auto.apply(plant_size_interaction, axis =1)
+
+
 
 #adjust value added dependent variable via CPI, per year
 CPI_excel_path = '/Users/Adam/Research/BA_Thesis/Data/CPI Unadjusted,annual,index units.xls'
@@ -275,6 +340,9 @@ def normalize_materials_cost(row):
 merged_df['Total value of products'] = merged_df.apply(normalize_valued_added, axis =1)
 merged_df['Total cost of materials, fuel, and electric cost(sum of f001, f002, f003)'] = merged_df.apply(normalize_materials_cost, axis =1)
 
+merged_df_auto['Total value of products'] = merged_df_auto.apply(normalize_valued_added, axis =1)
+merged_df_auto['Total cost of materials, fuel, and electric cost(sum of f001, f002, f003)'] = merged_df_auto.apply(normalize_materials_cost, axis =1)
+
 ########################## fill in blank rows with 0 ###############
 
 #merged_df.groupby('ID code')
@@ -290,6 +358,7 @@ def balance_data(row):
 	return first_year
 			
 merged_df['Balance year'] = merged_df.apply(balance_data, axis =1)
+merged_df_auto['Balance year'] = merged_df_auto.apply(balance_data, axis =1)
 
 
 
@@ -299,6 +368,7 @@ merged_df['Balance year'] = merged_df.apply(balance_data, axis =1)
 	
 #now just create a new df with only variables you want for regression
 regression_df = merged_df[desired_regression_var]
+regression_df_auto = merged_df_auto[desired_regression_var]
 
 def balance_data2(df):
 	new_rows = []
@@ -329,6 +399,7 @@ writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
 merged_df.to_excel(writer, 'Sheet1')
 writer.save()
 '''
+
 '''
 excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx'
 writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
