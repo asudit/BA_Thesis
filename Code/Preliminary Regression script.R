@@ -67,8 +67,14 @@ industry <- Panel$Industry
 #Year <- as.factor(Year)
 fixed <- lm(val_added ~ Post*var_interest + labor + capital + factor(county) + factor(Year)  -1 , data=Panel)
 fixed_alt_iv <- lm(val_added ~ Post*alt_iv + labor + capital + factor(county) + factor(Year) -1 , data=Panel)
+fixed_alt_iv_lag <- lm(val_added ~ Post*Panel$alt_iv_lag + labor + capital + factor(county) + factor(Year) -1 , data=Panel)
+
+robust_check <- lm(alt_iv ~ val_added + labor + capital + factor(county) + factor(Year) -1 , data=Panel)
+
 summary(fixed)
 summary(fixed_alt_iv)
+summary(fixed_alt_iv_lag)
+summary(robust_check)
 
 fixed_external <- lm(val_added ~ Post*var_interest + labor + capital + factor(county) + factor(Year) -1 + Panel$Branch.or.subsidiary.of.other.firm.1, data=Panel)
 summary(fixed_external)
@@ -83,19 +89,28 @@ library(multiwayvcov)
 #robust_se2    <- sqrt(diag(cov2))
 vcov_year <- cluster.vcov(fixed, Panel$County) #adjust variance covariance matrix via clustering
 vcov_year_alt <- cluster.vcov(fixed_alt_iv, Panel$County)
+
 fixed_robust <- coeftest(fixed, vcov_year)
 #run t test on model, with clustering covar matrix
-alt_iv_robust <- coeftest(fixed_alt_iv, vcov_year_alt)
+#alt_iv_robust <- coeftest(fixed_alt_iv, vcov_year_alt)
 #just to check roughly the same
-coeftest(fixed_alt_iv, vcov=vcovHC(fixed_alt_iv,type="HC0",cluster="county"))
+alt_iv_robust <- coeftest(fixed_alt_iv, vcov=vcovHC(fixed_alt_iv,type="HC0",cluster="county"))
 #####
 summary(fixed_robust)
 
+#vcov_year_check <- cluster.vcov(robust_check, Panel$County)
+#robust_check_clustered <- coeftest(robust_check, vcov_year_check)
+robust_check_clustered<- coeftest(robust_check, vcov=vcovHC(robust_check,type="HC0",cluster="county"))
+
 #summary(fixed_alt_iv)
-labor_elasticity <- lm(labor ~ var_interest)
+#labor_elasticity <- lm(labor ~ var_interest)
+labor_elasticity <- lm(labor ~ Panel$alt_iv)
 summary(labor_elasticity)
-cap_elasticity <- lm(capital ~ var_interest)
+#cap_elasticity <- lm(capital ~ var_interest)
+cap_elasticity <- lm(capital ~ Panel$alt_iv)
 summary(cap_elasticity)
+output_elasticity <- lm(Panel$Total.value.of.products ~ Panel$alt_iv)
+summary(output_elasticity)
 #random <- plm(val_added ~ banks_sus_ratio + labor + capital, data=Panel, index=c('ID.code', 'Year'), model="random")
 
 
@@ -209,7 +224,7 @@ for (i in 4:nrow(probit_panel)){
 
 open_35 <- probit_panel$Open.in.1935
 val_added_probit  <- probit_panel$Total.value.of.products
-var_interest_probit <- probit_panel$bank_sus_norm
+var_interest_probit <- probit_panel$alt_iv
 
 Year <- probit_panel$Year
 county <- probit_panel$County
@@ -217,14 +232,15 @@ county <- probit_panel$County
 library(dplyr)
 labor_probit <- probit_panel$Wage.earners.by.months..total
 capital_probit <- probit_panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.
+Post_probit <- probit_panel$Post_1929
 
 labor_diff_quintile <- ntile(probit_panel$l_4diff, 5) 
 capital_diff_quintile <- ntile(probit_panel$k_4diff, 5)
 
-probit_panel$labor <- labor
-probit_panel$capital <- capital
-probit_panel$labor_diff_quintile <- labor_diff_quintile
-probit_panel$capital_diff_quintile <- capital_diff_quintile
+#probit_panel$labor <- labor
+#probit_panel$capital <- capital
+#probit_panel$labor_diff_quintile <- labor_diff_quintile
+#probit_panel$capital_diff_quintile <- capital_diff_quintile
 
 labor_quintile <- ntile(labor, 5) 
 capital_quintile <- ntile(capital, 5) 
@@ -239,8 +255,9 @@ probit_no_error <- glm(open_35 ~ Post_probit*var_interest_probit + labor_probit 
 summary(probit_no_error)
 
 #cluster probit
-vcov_year_probit <- cluster.vcov(probit_no_error, probit_panel$County) #adjust variance covariance matrix via clustering
-probit_robust <- coeftest(probit_no_error, vcov_year_probit)
+#vcov_year_probit <- cluster.vcov(probit_no_error, probit_panel$County) #adjust variance covariance matrix via clustering
+#probit_robust <- coeftest(probit_no_error, vcov_year_probit)
+probit_robust <- coeftest(probit_no_error, vcov=vcovHC(probit_no_error,type="HC0",cluster="County"))
 
 summary(probit_no_error)
 
@@ -248,8 +265,8 @@ vcov_year_probit <- cluster.vcov(probit_no_error, probit_panel$County) #adjust v
 probit_robust <- coeftest(probit_no_error, vcov_year_probit)
 #################main robustness check(s)#############################
 library(sqldf)
-Panel_robust <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx", 1)
-#Panel <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx", 1)
+#Panel_robust <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx", 1)
+Panel_robust <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx", 1)
 panel_elements <- Panel_robust[c('Year', 'ID.code')]
 dup <- data.frame(duplicated(panel_elements))
 
@@ -270,7 +287,7 @@ Panel_31 <-Panel_31[order(Panel_31$ID.code,Panel_31$Year),]
 
 Panel_29 <- Panel_robust[(Panel_robust$Year == '1929') ,]
 Panel_29['bank_sus_29'] <- Panel_29$FDIC_BANKS_SUS
-Panel_29['banks'] <- Panel_29$FDIC_BANKS
+#Panel_29['banks'] <- Panel_29$FDIC_BANKS
 Panel_29 <-Panel_29[order(Panel_29$ID.code,Panel_29$Year),]
 Panel_29['capital'] <- Panel_29['Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.']
 Panel_29['labor'] <- Panel_29['Wage.earners.by.months..total']
@@ -280,7 +297,7 @@ Panel_29['ID1'] <- Panel_29['ID.code']
 Panel_31['ID2'] <- Panel_31['ID.code']
 
 merged_29_31 <- sqldf('Select a.bank_sus_31, a.ID2 ,b.labor, b.capital,
-                    b.output, b.banks
+                    b.output, b.County
                     FROM Panel_31 AS a JOIN 
                      Panel_29 AS b ON (a.ID2 = b.ID1)')
 robust_1 <- lm(merged_29_31$bank_sus_31 ~ merged_29_31$capital + merged_29_31$labor, data=merged_29_31)
@@ -295,14 +312,24 @@ merged_29_33 <-sqldf('Select a.* ,b.bank_sus_33
                     FROM merged_29_31 AS a left OUTER JOIN 
                      Panel_33 AS b ON (a.ID2 = b.ID1)')
 
-merged_29_35 <- sqldf('Select a.* ,b.bank_sus_35 
+merged_29_35 <- sqldf('Select a.* ,b.bank_sus_35
                     FROM merged_29_33 AS a left OUTER JOIN 
                      Panel_35 AS b ON (a.ID2 = b.ID2)')
+#county <- merged_29_35$County
+
+#merged_29_35$bank_sus_31[is.na(merged_29_35$bank_sus_31)] <- 0
+#merged_29_35$bank_sus_31[is.na(merged_29_35$bank_sus_33)] <- 0
+#merged_29_35$bank_sus_31[is.na(merged_29_35$bank_sus_33)] <- 0
+
+
+
 merged_29_35['bank_sus_31_35'] <- merged_29_35$bank_sus_31 + merged_29_35$bank_sus_33 + merged_29_35$bank_sus_35
-robust_3 <- lm(merged_29_35$bank_sus_31_35 ~ merged_29_35$capital + merged_29_35$labor, data=merged_29_35)
-robust_4 <- lm(merged_29_35$bank_sus_31_35 ~ merged_29_35$output, data=merged_29_35)
-summary(robust_3)
-summary(robust_4)
+#robust_3 <- lm(merged_29_35$bank_sus_31_35 ~ merged_29_35$capital + merged_29_35$labor, data=merged_29_35)
+robust_check2 <- lm(merged_29_35$bank_sus_31_35 ~ merged_29_35$output + merged_29_35$capital + merged_29_35$labor + factor(merged_29_35$County), data=merged_29_35)
+#summary(robust_3)
+summary(robust_check2)
+
+robust_check2_cluster <- coeftest(robust_check2, vcov=vcovHC(robust_check2,type="HC0",cluster="County"))
 
 
 #---aggregation of all observations after 1929, for simplicity############################################
@@ -325,6 +352,11 @@ Panel_pre['ID'] <- Panel_pre$ID.code
 Panel_post['ID'] <- Panel_post$ID.code
 agg_columns <- cbind(Panel_post$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003., Panel_post$Total.value.of.products,
                      Panel_post$Wage.earners.by.months..total, Panel_post$alt_iv)
+
+#I think this is Kosher right? -- yea dont do this, must of the NA's include 1929 as NA, so doesnt even matter
+#for purposes of the regression
+#agg_columns[is.na(agg_columns) & agg_columns[]] <- 0
+
 Panel_agg <- aggregate(agg_columns, by=list(ID=Panel_post$ID), FUN=sum)
 library(plyr)
 Panel_agg <- rename(Panel_agg, c("V1"="Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.", 
@@ -339,12 +371,13 @@ Panel_agg <- sqldf('Select DISTINCT a.*, b.bank_sus_norm ,b.County
                     FROM Panel_agg AS a JOIN 
                      Panel_post AS b ON (a.ID = b.ID)')
 Panel_agg['Post'] <- rep(1,nrow(Panel_agg))
-
+Panel_agg['Year_fixed'] <- rep('Post',nrow(Panel_agg))
 Panel_pre['Post'] <- rep(0,nrow(Panel_pre))
+Panel_pre['Year_fixed'] <- rep('Pre',nrow(Panel_pre))
 
 Panel_2per <- rbind(Panel_pre[,c('ID',"Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.",
                                       "Total.value.of.products", "Wage.earners.by.months..total",
-                                      'alt_iv',"bank_sus_norm", 'County','Post')], Panel_agg) 
+                                      'alt_iv',"bank_sus_norm", 'County','Post', 'Year_fixed')], Panel_agg) 
 Panel_2per<-Panel_2per[order(Panel_2per$ID,Panel_2per$Post),]
 
 #sign of post*var_interest makes sense -- not so without interaction effect
@@ -369,10 +402,12 @@ library(multiwayvcov)
 require(multiwayvcov)
 require(lmtest)
 
-#vcov_year_pre <- cluster.vcov(fixed_2per_alt_iv, Panel_2per$County)
-#fixed_2per_alt_iv_robust <- coeftest(fixed_2per_alt_iv, vcov_year_pre)
+vcov_year_pre <- cluster.vcov(fixed_2per_alt_iv, Panel_2per$County)
+fixed_2per_alt_iv_robust <- coeftest(fixed_2per_alt_iv, vcov_year_pre)
 #im giving up on getting vcov to work here. Results are almost the same for this method below
-coeftest(fixed_2per_alt_iv, vcov=vcovHC(fixed_2per_alt_iv,type="HC0",cluster="County"))
+
+#ask Hornbeck if white's estimator, clustered by County is ok
+fixed_2per_alt_iv_robust <- coeftest(fixed_2per_alt_iv, vcov=vcovHC(fixed_2per_alt_iv,type="HC0",cluster="County"))
 #run t test on model, with clustering covar matrix
 
 
@@ -380,23 +415,15 @@ coeftest(fixed_2per_alt_iv, vcov=vcovHC(fixed_2per_alt_iv,type="HC0",cluster="Co
 
 
 #######make tables####
-table1 <- stargazer(fixed, fixed_robust,title="Fixed Characteristc IV", align=TRUE)
-table2 <-  stargazer(fixed_alt_iv, alt_iv_robust, title="Time-Varying IV", align=TRUE)
-table3 <- stargazer(probit_no_error, probit_robust, title="Probit Model", align=TRUE)
-table4 <- stargazer(first_diff, fourth_diff, title="Differenced Models", align=TRUE)
-table5 <- stargazer(robust_1, robust_2, title="Robustness Check 1", align=TRUE)
-table5 <- stargazer(robust_3, robust_4, title="Robustness Check 2", align=TRUE)
+#table1 <- stargazer(fixed, fixed_robust,title="Fixed Characteristc IV", align=TRUE)
+table2 <-  stargazer(alt_iv_robust, title="Fixed Effects Model", align=TRUE)
 
-
-
-
-
-
-
-
-
-
-
+table3 <- stargazer(probit_robust, title="Probit Model", align=TRUE)
+table4 <- stargazer(fixed_2per_alt_iv_robust, title="Fixed Effects -- Two Period Model", align=TRUE)
+#table4 <- stargazer(first_diff, fourth_diff, title="Differenced Models", align=TRUE)
+table5 <- stargazer(robust_check_clustered, title="Robustness Check 1", align=TRUE)
+#table5 <- stargazer(robust_1, robust_2, title="Robustness Check 1", align=TRUE)
+table5 <- stargazer(robust_check2_cluster, title="Robustness Check 2", align=TRUE)
 
 #-----
 merged_33_35 <-sqldf('Select a.bank_sus_33, a.ID1 ,b.bank_sus_35, 
@@ -493,4 +520,7 @@ ggplot(Panel, aes(x=val_added, y=y2)) + geom_point()
 test = lm(val_added ~ y2 -1, data = Panel)
 summary(test)
 
-
+######for rough draft maybe? -- Maybe a better motivation is to plot against bank suspensions, not the iv
+ggplot(data = Panel, aes(x=Panel$alt_iv, y=Panel$Wage.earners.by.months..total))   + geom_point() + stat_smooth(method = "lm", col = "red") + xlab("Bank Distress") + ylab("Labor") + ggtitle("Scatterplot of Labor vs. Bank Distress (with OLS fit line)")
+ggplot(data = Panel, aes(x=Panel$alt_iv, y=Panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.))   + geom_point() +  stat_smooth(method = "lm", col = "red") + xlab("Bank Distress") + ylab("Capital") + ggtitle("Scatterplot of Capital vs. Bank Distress (with OLS fit line)")
+ggplot(data = Panel, aes(x=Panel$alt_iv, y=Panel$Total.value.of.products))   + geom_point() +  stat_smooth(method = "lm", col = "red") + xlab("Bank Distress") + ylab("Output") + ggtitle("Scatterplot of Output vs. Bank Distress (with OLS fit line)")

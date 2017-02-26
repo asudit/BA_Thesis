@@ -79,8 +79,10 @@
 \maketitle
 
 \section{Introduction}
+I study the effects of bank distress on manufacturing firms' output during the Great Depression, within the cotton goods industry. Using different models, I find that bank distress does indeed have a negative effect on firm output, as well as the probability they'll stay open after the crisis. The standard errors of the fixed effects models are realtively high, and not statistically significant, which motivates my direction for further work. On the other hand, the coefficient on the variable of interest of the probit model is large in magnitude, statistically significant, and negative, which could indicate that bank distress could make firms more likely to close down in the wake of economic crisis. 
+
 \section{Statement of the Research Question}
-During times of financial panic, what is the effect of bank distress on mnaufacturing output? The research question is magnified to: during the Great Depression, what was the effect of bank distress on plant-level output in the cotton goods industry?
+During times of financial panic, what is the effect of bank distress on manufacturing output, and the likelihood a manufacturing firm will stay open after the end of the financial panic? More specifically, during the Great Depression, what was the effect of bank distress on plant-level output in the cotton goods industry, and the probability those plants were open after the Great Depression?
 \section{Literature Review}
 
 \indent Conventional wisdom has been that monetary channels are the main way in which a financial crisis affects real economic activity. In particular, many thought that bank distress depresses the economy by decreasing the supply of money (Friedman and Schwartz 1963). Even so, this theory cannot fully explain the prodigious decline in output during the Great Depression, among other flaws. Bernanke (1983) redefined the economic literature by showing that while monetary channels are important to establishing a causal connection between bank distress and economic activity, non-monetary channels have a significant role to play as well. His key idea is that of the cost of intermediation in incomplete markets; as the transaction costs inherent to an incomplete market like bank lending increase in the wake of financial panic, the acquisition of credit become prohibitively expensive. As Bernanke then points out (pg.21), aggeregate demand of the household must then decrease, in turn causing aggregate output to plummet. Bernanke asserts that this theory better explains the severity of the Great Depression. Even so, one important flaw in his theory is that it does not disaggregate supply effects from demand effects within the lending channel, the mechanism through which credit is passed from a lender to a borrower. Indeed, a bank may choose to not extend credit during a financial crisis not because of weakening financial health on the part of the bank, but because ailing borrowers make for a poor return on investment. This reverse casuality could cause Bernanke's results to be overstated. Calomiris and Mason (2003) attempt to circumvent this issue by instrumenting for loan supply and exploiting cross-state variation in state-level influences on lending channels to robustly identify the casual link between bank distress and growth in state-level income. 
@@ -94,22 +96,22 @@ During times of financial panic, what is the effect of bank distress on mnaufact
 \indent This paper seeks to contribute to the literature by extending Calomiris and Mason's inuition to plant-level data from the Census of Manufacturers, from 1929-1936. My identification strategy relies on cross-county heterogeienity in bank health and solvency outcomes, along with the insight that the demand for credit by county-level manufacturing plants most likely did not have an economically significant effect on bank health on the county, state, and national level. Previous papers that use firm or plant-level data to this effect during the Great Depression include Ziebarth (2013), Lee and Mezzanotti (2014), and Nanda et. al (2014). 
 
 \section{Data Sources}
-\indent The principal source of data comes from the U.S. Census of Manufacturers, for 1929, 1931, 1933, and 1935. In particular, the data is for the Cotton Goods Industry. The census has plant-level data for 1508 unique plants across the United States. The dataset is taken to be exhaustive of all firms in the cotton goods industry , since there are indicator variables for each plant indicating whether they were open in each year spanning the dataset. In order to balance the data, I create additional observations for each firm for years in which the firm did not exist, or had closed. For years before a firm opened, I create a firm-year observation filled with missing values. For years following a firm closure, I create firm-year observations filled with zeros. I use the Census data for my firm-level measures of capital, labor, and output. 
+\indent The principal source of data comes from the U.S. Census of Manufacturers, for 1929, 1931, 1933, and 1935. In particular, the data is for the Cotton Goods Industry. The census has plant-level data for 1508 unique plants across the United States. The dataset is taken to be exhaustive of all firms in the cotton goods industry , since there are indicator variables for each plant indicating whether they were open in each year spanning the dataset. In order to balance the data, I create additional observations for each firm for years in which the firm did not exist, or had closed. For years before a firm opened, I create a firm-year observation filled with missing values. For years following a firm closure, I create firm-year observations filled with zeros. For the variable of interest (see below), I calculate the level of bank distress for a given observation I have created. So for a firm that did not exist in 1929, I still calculate the level of bank distress for that firm's county in 1929 (and similarly for a firm that was closed). Since all the firm-level variables would still be NA, this wouldn't create spurious results. I use the Census data for my firm-level measures of capital, labor, and output. 
 \\
-\indent The second source of data is bank data from the Federal Deposit Insurance Corporation (FDIC) from 1920-1936. It has county-level information on the number of banks suspended, the number of deposits of suspended and non-suspended banks, and the total number of banks. The FDIC data is quite useful because it has data on all banks, regardless of if they were part of the Federal Reserve System or not (as Nanda notes?). I construct a time-varying measure of bank distress on the county level from the FDIC data on both bank suspensions and total number of banks:
+\indent The second source of data is bank data from the Federal Deposit Insurance Corporation (FDIC) from 1920-1936. It has county-level information on the number of banks suspended, the number of deposits of suspended and non-suspended banks, and the total number of banks. The FDIC data is quite useful because it has data on all banks, regardless of if they were part of the Federal Reserve System or not, as Nanda et. al (2014) notes. I construct a time-varying measure of bank distress on the county level from the FDIC data on both bank suspensions and total number of banks:
 \begin{align*}
 BankDistress_{c, t} = \frac{BankSuspensions_{c, t}} {Banks_{c, 1929}}
 \end{align*}
 While my measure is based on previous the literature (see Nanda et. al (2014)), I create a time-varying measure, instead of a fixed county-characteristic from 1930-1933. The number of bank suspensions in a given county-year is normalized by the number of counties in 1929 to make the measure meaningful across different counties. As will be seen in the model section, this measure of bank distress is used as a shock to firm production. The shock is introduced after 1929, since as Calomiris and Mason (2000) note, Friedman and Schwartz (1963) identify the first major banking panic as occurring in October of 1930.  
 \\
-\indent After formatting the FDIC from wide to long, I then create a merged dataset by merged the census data with the FDIC data by county, state, and year. 
+\indent After formatting the FDIC from wide to long, I then create a merged dataset by merging the census data with the FDIC data by county, state, and year. 
 \\
 \indent The last data source is the Consumer Price Index (CPI). Since my measures of capital and output are in nominal terms, I normalize them using the CPI. 
 
 \section{Model}
 
 
-\indent Before examining the main empriical specification, consider the following graphs which show capital and labor plotted against the bank distress variable: 
+\indent Before examining the main empirical specification, consider the following graphs which show capital and labor plotted against the bank distress variable: 
 \begin{figure}[!htb]
 \minipage{0.5\textwidth}
   \includegraphics[width=\linewidth, angle=0]{"/Users/Adam/Research/BA_Thesis/Graphs/Capital vs Var Interest".pdf}
@@ -150,26 +152,32 @@ y_{it} = \beta_0 After\_1929 x BankDistress_{c,t} + \beta_1 l_{it} + \beta_2 k_{
 
 \subsection{Reverse Casuality}
 
-There is a major potential pitfall in my identification strategy: I am assuming that bank distress affects firm output, and not other way around. It is conceivable that in general, reverse casuality is present. I argue that this is not a major concern for this study. A firm's declining output could precede it becoming illiquid, causing them to default on their loan payemnts to a bank. If this happened multiple times to various firms that borrowed from one bank, a bank's debt would drastically increase, to the point that they are forced to go bankrupt or suspend operations. But the firms I am considering in this paper are relatively small, and our model measures the effect of all suspensions in a given county on the output of one firm. It is unlikely that a loan to a small business would make up enough of a bank's balance sheet, let alone all county banks' balances sheets, so that if that business were to fail, it would cause the bank's liabilities to rise to unsustainable levels and lead to insolvency. 
+There is a major potential pitfall in my identification strategy: I am assuming that bank distress affects firm output, and not the other way around. It is conceivable that in general, reverse casuality is present. I argue that this is not a major concern for this study. A firm's declining output could precede it becoming illiquid, causing them to default on their loan payemnts to a bank. If this happened multiple times to various firms that borrowed from one bank, a bank's debt would drastically increase, to the point that they are forced to go bankrupt or suspend operations. But the firms I am considering in this paper are relatively small, and our model measures the effect of all suspensions in a given county on the output of one firm. It is unlikely that a loan to a small business would make up enough of a bank's balance sheet, let alone all county banks' balances sheets, so that if that business were to fail, it would cause the bank's liabilities to rise to unsustainable levels and lead to insolvency. 
 \\
-\indent In order illustrate this intuition empriically, we run the following robustness checks:
+\indent In order illustrate this intuition empirically, we run the following robustness checks:
 \begin{align*}
-After\_1929 x BankDistress_{c,t} = \beta_0  + \beta_1 y_{it} + \beta_2 l_{it} + \beta_3 k_{it} + \alpha_c + \gamma_t + \epsilon
+BankDistress_{c,t} = \beta_0 y_{it} + \beta_1 l_{it} + \beta_2 k_{it} + \alpha_c + \gamma_t + \epsilon
 \end{align*}
-After controlling for plant capital and labor levels, along with time and county fixed effects, we want to measure the effect of firm output on bank distress after 1929, when the banking shocks occur. To see if firm output in 1929 can predict subsequent bank failures, I also run the following robustness check:
+After controlling for plant capital and labor levels, along with time and county fixed effects, we measure the effect of firm output on bank distress. To see if firm output in 1929 can predict subsequent bank failures, I also run the following robustness check:
 \begin{align*}
 BankSuspensions_c  =  \beta_0+ \beta_1 y_{i, 1929} + \beta_2 l_{i, 1929} + \beta_3 k_{i, 1929} + \alpha_c  + \epsilon
 \end{align*}
 
-Where $BankSuspensions_c$ are all bank suspensions that occurred after 1929 in the sample for a given county, and labor, capital, and output are from 1929. 
+Where $BankSuspensions_c$ are all bank suspensions that occurred after 1929 in the sample for a given county, and labor, capital, and output are from 1929. In other words, I have divided the sample into one cross-section. Both models are clustered by county using white standard errors.
+\\
+\indent Observe tables 4 and 5 in the appendix section. Table 4 represents the first robustness check, table 5 the second. Though our results are not statistically significant, we can see output has a very small effect on both bank suspensions and bank distress, if any effect. As to the first specification, one could argue that this is because on average, output is much greater in magnitude than the measure of bank distress, and thus the small effect is spurious. But the average level of bank distress in the sample is 0.03894063. So if output (or capital and labor) were to have some large effect on bank distress, one would expect it to still be larger than the coefficients we have. Again, the results are not statistically significant, so these robustness checks are a heuristic at best.
 
 \section{Findings}
+\indent Turn to table 1 to discuss the main fixed effects specification. One can see that bank distress introduced after 1929 (last row) does indeed have a negative effect on a firm's output. That being said, the standard errors for the variable of interest are quite large, and the coefficient of interest is not statistically significant. The main reason this is the case is my small sample size, coupled with a lack of variation in the bank distress variable. Indeed, for 1933 and 1935 in particular, the number of banks that were suspended was generally much lower than that of 1930-1934, and often 0. Since two of the four years in the sample are in 1933 and 1935, one could see how this would create problematic results.
+\indent Now turn to table 2, for the probit model. We see that relative to it's standard error, bank distress after 1929 (second to last row) has a large, negative, and staistically significant effect on whether a firm was open in 1935. A high level of bank distress could make it more diffuclt for firms to obtain funding during economic crisis, making it less likely they'd be able to stay open in 1935. Perhaps this model merits further investigation.
+\indent Lastly, we look at table 3, for the fixed effects two period model. We see that when we partition the sample into post shock and pre shock periods, our results are a little more robust. Since we're aggregating the bank distress variable for the years 1931, 1933, and 1935, this could mitigate the lack of variation in the main specification. The sign of variable of interest (last row) also make economic sense -- bank distress has a negative effect on a firm's output. Also, the standard errors are much lower than they were in table 1, though our results are still not statistically significant. 
 
 \section{Conclusion}
+We have found that bank distress in times of financial crisis does indeed have a detrimental effect on the firm, be it the probability they'll stay open after a financial crisis, or their overall output. 
 
 \section{Directions for Further Work}
 
-\indent The main direction for further work is getting more robust results. As of now, I have relatively high standard errors. I hope to find a specification that is better for my small sample size. Originally, I ran differenced fixed effects models, but my sample size was too small to make it work well.
+\indent The main direction for further work is getting more robust results. As of now, I have relatively high standard errors, especially for the main specification. I hope to find a specification that is better for my small sample size, and the low variation in bank suspensions in later years of the sample. One possibility is to reframe the research question -- it seems that the probit model might be able to produce more robust results. My robustness checks could also be a little more polished/sophisticated. If I have time, I'd like to make those checks more convincing to the reader.
 \\
 \indent I also might incorporate data from the automobile industry into my sample, and run the same models but with indistry fixed effects. The auto manufacturing data is quite small though, so I'm unsure how helpful it will be to add to my sample. 
 \\
@@ -195,149 +203,194 @@ We now turn to the firm. \iffalse The firm has two sources of funding -- loans f
 L_{ij}^t + \iffalse \mathds{1}_{Large firm} E_{ij}^t +\fi Q_t = K_j^{t+1} + L_j^{t+1} + r_j^{t+1}
 \end{align*}
 
-
-
-\section{Bibliography}
 \section{Appendix}
 
 % Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
-% Date and time: Sat, Feb 25, 2017 - 16:18:02
+% Date and time: Sun, Feb 26, 2017 - 10:41:42
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
-  \caption{Fixed Effects Models} 
+  \caption{Fixed Effects Model} 
   \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} } 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
 \\[-1.8ex]\hline 
 \hline \\[-1.8ex] 
- & \multicolumn{2}{c}{\textit{Dependent variable: Total Value Added}} \\ 
-\cline{2-3} 
-\\[-1.8ex] & \multicolumn{1}{c}{} & \multicolumn{1}{c}{ } \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{Without clustering}} & \multicolumn{1}{c}{\textit{With clustering}} \\ 
- & \multicolumn{1}{c}{\textit{}} & \multicolumn{1}{c}{\textit{}} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\ 
+ & \multicolumn{1}{c}{\textit{Dependent variable: Total Value Added}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & \multicolumn{1}{c}{ } \\ 
 \hline \\[-1.8ex] 
- Post\_1929 & 1,842.725^{**} & 1,842.725 \\ 
-  & (938.955) & (1,156.081) \\ 
-  & & \\ 
- BankDistress & 8,403.473^{***} & 8,403.473 \\ 
-  & (2,837.277) & (6,873.815) \\ 
-  & & \\ 
- labor & 5.660^{***} & 5.660^{***} \\ 
-  & (0.143) & (0.342) \\ 
-  & & \\ 
- capital & 1.122^{***} & 1.122^{***} \\ 
-  & (0.016) & (0.050) \\ 
-  & & \\ 
- factor(Year)1931 & -2,278.331^{*} & -2,278.331 \\ 
-  & (1,177.240) & (1,575.049) \\ 
-  & & \\ 
- factor(Year)1933 & -270.293 & -270.293 \\ 
-  & (1,100.379) & (1,428.646) \\ 
-  & & \\ 
- factor(Year)1935 & -4,547.199^{***} & -4,547.199^{***} \\ 
-  & (1,040.571) & (1,217.462) \\ 
-  & & \\ 
- Post\_1929*BankDistress & -8,126.486 & -8,126.486 \\ 
-  & (5,397.212) & (7,382.870) \\ 
-  & & \\ 
+ Post\_1929 & 952.587 \\ 
+  & (816.160) \\ 
+  & \\ 
+ Bank Distress & 113.786 \\ 
+  & (3,695.821) \\ 
+  & \\ 
+ labor & 5.660^{***} \\ 
+  & (0.424) \\ 
+  & \\ 
+ capital & 1.122^{***} \\ 
+  & (0.040) \\ 
+  & \\ 
+ factor(Year)1931 & -2,287.391 \\ 
+  & (1,446.050) \\ 
+  & \\ 
+ factor(Year)1933 & -375.352 \\ 
+  & (1,387.472) \\ 
+  & \\ 
+ factor(Year)1935 & -4,654.513^{***} \\ 
+  & (1,269.567) \\ 
+  & \\ 
+ Post\_1929*Bank Distress & -1,830.421 \\ 
+  & (5,349.358) \\ 
+  & \\ 
 \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{5,207} &  \\ 
-R$^{2}$ & \multicolumn{1}{c}{0.955} &  \\ 
-Adjusted R$^{2}$ & \multicolumn{1}{c}{0.952} &  \\ 
-Residual Std. Error & \multicolumn{1}{c}{21,161.700 (df = 4913)} &  \\ 
-F Statistic & \multicolumn{1}{c}{354.556$^{***}$ (df = 294; 4913)} &  \\ 
 \hline 
 \hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
 \end{tabular} 
 \end{table} 
 
 % Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
-% Date and time: Sat, Feb 25, 2017 - 16:30:20
+% Date and time: Sun, Feb 26, 2017 - 11:11:33
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Probit Model} 
   \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} } 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
 \\[-1.8ex]\hline 
 \hline \\[-1.8ex] 
- & \multicolumn{2}{c}{\textit{Dependent variable: Open in 1935 (binary variable)}} \\ 
-\cline{2-3} 
-\\[-1.8ex] & \multicolumn{1}{c}{} & \multicolumn{1}{c}{ } \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{Without clustering}} & \multicolumn{1}{c}{\textit{With clustering}} \\ 
- & \multicolumn{1}{c}{\textit{}} & \multicolumn{1}{c}{\textit{}} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\ 
+ & \multicolumn{1}{c}{\textit{Dependent variable: Open in 1935 (Binary variable)}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & \multicolumn{1}{c}{ } \\ 
 \hline \\[-1.8ex] 
- Post\_1929 & 1.321^{***} & 1.321^{***} \\ 
-  & (0.047) & (0.065) \\ 
-  & & \\ 
- BankDistress & 0.352^{***} & 0.352^{*} \\ 
-  & (0.135) & (0.207) \\ 
-  & & \\ 
- labor & 0.00001 & 0.00001 \\ 
-  & (0.00002) & (0.00004) \\ 
-  & & \\ 
- capital & 0.00001^{***} & 0.00001^{***} \\ 
-  & (0.00000) & (0.00000) \\ 
-  & & \\ 
- Post\_1929*BankDistress & -0.718^{**} & -0.718 \\ 
-  & (0.323) & (0.572) \\ 
-  & & \\ 
- Constant & -0.584^{***} & -0.584^{***} \\ 
-  & (0.036) & (0.064) \\ 
-  & & \\ 
+ Post\_1929 & 1.423^{***} \\ 
+  & (0.049) \\ 
+  & \\ 
+ Bank Distress & 2.104^{***} \\ 
+  & (0.235) \\ 
+  & \\ 
+ labor & 0.00001 \\ 
+  & (0.00003) \\ 
+  & \\ 
+ capital & 0.00001^{***} \\ 
+  & (0.00000) \\ 
+  & \\ 
+ Post\_1929*Bank Distress & -2.146^{***} \\ 
+  & (0.459) \\ 
+  & \\ 
+ Constant & -0.678^{***} \\ 
+  & (0.040) \\ 
+  & \\ 
 \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{4,820} &  \\ 
-Log Likelihood & \multicolumn{1}{c}{-2,307.301} &  \\ 
-Akaike Inf. Crit. & \multicolumn{1}{c}{4,626.603} &  \\ 
 \hline 
 \hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
 \end{tabular} 
 \end{table} 
 
 % Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
-% Date and time: Sat, Feb 25, 2017 - 19:14:55
+% Date and time: Sun, Feb 26, 2017 - 10:48:30
 % Requires LaTeX packages: dcolumn 
 \begin{table}[!htbp] \centering 
   \caption{Fixed Effects -- Two Period Model} 
   \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} } 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
 \\[-1.8ex]\hline 
 \hline \\[-1.8ex] 
- & \multicolumn{2}{c}{\textit{Dependent variable: Total Value Added}} \\ 
-\cline{2-3} 
-\\[-1.8ex] & \multicolumn{1}{c}{Without Clustering} & \multicolumn{1}{c}{With Clustering} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{\textit{}} & \multicolumn{1}{c}{\textit{}} \\ 
- & \multicolumn{1}{c}{\textit{}} & \multicolumn{1}{c}{\textit{}} \\ 
-\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\ 
+ & \multicolumn{1}{c}{\textit{}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & \multicolumn{1}{c}{ } \\ 
 \hline \\[-1.8ex] 
- Post\_1929 & 515.813 & 515.813 \\ 
-  & (1,469.060) & (1,718.132) \\ 
-  & & \\ 
- BankDistress & 13,988.430^{**} & 13,988.430 \\ 
-  & (5,862.418) & (11,060.750) \\ 
-  & & \\ 
- Capital & 1.257^{***} & 1.257^{***} \\ 
-  & (0.019) & (0.051) \\ 
-  & & \\ 
- Labor & 4.775^{***} & 4.775^{***} \\ 
-  & (0.160) & (0.359) \\ 
-  & & \\ 
- Post\_1929 * BankDistress & -11,762.620^{**} & -11,762.620 \\ 
-  & (5,861.229) & (9,687.415) \\ 
-  & & \\ 
+ Post\_1929 & 325.530 \\ 
+  & (1,588.997) \\ 
+  & \\ 
+ Bank Distress & 7,730.916 \\ 
+  & (5,336.263) \\ 
+  & \\ 
+ Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003. & 1.257^{***} \\ 
+  & (0.052) \\ 
+  & \\ 
+ Wage.earners.by.months..total & 4.768^{***} \\ 
+  & (0.359) \\ 
+  & \\ 
+ Post\_1929*Bank Distress & -13,766.570 \\ 
+  & (11,697.850) \\ 
+  & \\ 
 \hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{2,528} &  \\ 
-R$^{2}$ & \multicolumn{1}{c}{0.979} &  \\ 
-Adjusted R$^{2}$ & \multicolumn{1}{c}{0.976} &  \\ 
-Residual Std. Error & \multicolumn{1}{c}{30,654.210 (df = 2245)} &  \\ 
-F Statistic & \multicolumn{1}{c}{369.493$^{***}$ (df = 283; 2245)} &  \\ 
 \hline 
 \hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
 \end{tabular} 
-\end{table}
+\end{table} 
+
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Sun, Feb 26, 2017 - 11:00:34
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Robustness Check 1} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{1}{c}{\textit{Dependent variable: Bank Distress}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & \multicolumn{1}{c}{ } \\ 
+\hline \\[-1.8ex] 
+ Total Value Added & -0.000 \\ 
+  & (0.00000) \\ 
+  & \\ 
+ labor & 0.00000 \\ 
+  & (0.00000) \\ 
+  & \\ 
+ capital & -0.00000 \\ 
+  & (0.00000) \\ 
+  & \\ 
+ factor(Year)1931 & -0.078^{***} \\ 
+  & (0.005) \\ 
+  & \\ 
+ factor(Year)1933 & -0.117^{***} \\ 
+  & (0.004) \\ 
+  & \\ 
+ factor(Year)1935 & -0.118^{***} \\ 
+  & (0.004) \\ 
+  & \\ 
+\hline \\[-1.8ex] 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table} 
+
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Sun, Feb 26, 2017 - 11:08:32
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Robustness Check 2} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{1}{c}{\textit{Dependent variable: Bank Suspsensions in Sample After 1929}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & \multicolumn{1}{c}{ } \\ 
+\hline \\[-1.8ex] 
+ Total Value Added in 1929 & 0.00000 \\ 
+  & (0.00000) \\ 
+  & \\ 
+ Capital in 1929 & -0.00000 \\ 
+  & (0.00000) \\ 
+  & \\ 
+ Labor in 1929 & -0.00000 \\ 
+  & (0.00001) \\ 
+  & \\ 
+ Constant & 0.008 \\ 
+  & (0.014) \\ 
+  & \\ 
+\hline \\[-1.8ex] 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table} 
 
 }
 

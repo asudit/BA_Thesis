@@ -233,6 +233,37 @@ def alt_iv(row):
 	return alt_iv
 merged_df['alt_iv'] = merged_df.apply(alt_iv, axis = 1)
 
+
+def alt_iv_lag(row):
+	county = row['County']
+	state = row['State']
+	year = row['Year']
+	banks_year = list(merged_df.loc[(merged_df['County'] == county) & (merged_df['Year'] == year) & (merged_df['State'] == state), 'FDIC_BANKS_SUS_'])
+	lag_year = year - 1
+	banks_year_lag = list(fdic_df_long.loc[(fdic_df_long['County'] == county) & (fdic_df_long['Year'] == lag_year ) & (fdic_df_long['State'] == state), 'FDIC_BANKS_SUS_'])
+	if banks_year == []:
+		banks_year = [0]
+	banks_year = banks_year[0]
+	if banks_year_lag == []:
+		banks_year_lag = [0]
+	banks_year_lag = banks_year_lag[0]
+	banks_year_avg = float((banks_year + banks_year_lag)/2)
+
+	banks_1929_list = list(merged_df.loc[(merged_df['Year'] == 1929) & (merged_df['County'] == county) & (merged_df['State'] == state), 'FDIC BANKS '])
+
+	#assert not isinstance(banks_1929_list, str)
+	if isinstance(banks_1929_list, str):
+		banks_1929 = banks_1929_list[0]
+	elif banks_1929_list == []:
+		banks_1929 = 1
+	else:
+		banks_1929 = banks_1929_list[0]
+
+	alt_iv_lag = float(banks_year_avg/banks_1929)
+	#print(alt_iv)
+	return alt_iv_lag
+merged_df['alt_iv_lag'] = merged_df.apply(alt_iv_lag, axis = 1)
+
 def normalize_suspensions_auto(row):
 	county = row['County']
 	state = row['State']
@@ -393,12 +424,12 @@ def balance_data2(df):
 #df1 = pd.DataFrame(new_rows, columns = desired_regression_var)
 #regression_df.append(df1)
 
-'''
+
 excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/preliminary_merge.xlsx'
 writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
 merged_df.to_excel(writer, 'Sheet1')
 writer.save()
-'''
+
 
 '''
 excel_test_path = '/Users/Adam/Research/BA_Thesis/Data/regression_var.xlsx'
