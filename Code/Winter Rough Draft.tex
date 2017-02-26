@@ -1,0 +1,344 @@
+
+\documentclass[letter,11pt]{article}
+%\selectlanguage{english}
+
+\AtBeginDocument{\setstretch{1.5}}
+
+%%% PACKAGES %%%
+\usepackage[english]{babel} % hyphenation
+\usepackage[margin=2cm]{geometry} % margins
+\usepackage{graphicx} % support for graphics
+\usepackage{amsmath} % support for math­e­mat­i­cal typesetting
+\usepackage{amssymb} % math­e­mat­i­cal symbols
+\usepackage{color} % support for colors
+\usepackage{mathtools} % more math­e­mat­i­cal type­set­ting
+\usepackage{amsthm} % for defining theorem-like environments
+\usepackage{enumerate} % change appearance of numbered lists
+\usepackage{framed} % textboxes
+\usepackage[format=plain,labelfont=bf,up]{caption} % cus­tomise cap­tions for fig­ures and ta­bles
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue,linktoc=all, citecolor=black]{hyperref} % hyperlinks
+\usepackage[usenames,dvipsnames]{xcolor} % more colors
+\usepackage{setspace} % set­ting the spac­ing be­tween lines
+\usepackage{titlesec} % sec­tion­ing com­mands
+\usepackage{subfigure} % multiple figures arranged neatly
+\usepackage{natbib} % references
+\usepackage{pdfpages} % import pages from other pdf fiels
+\usepackage{comment} % comment out large sections
+\usepackage{cancel} % strikethrough math
+\usepackage{verbatim} % for including code
+\usepackage{titlesec} % change font size of section
+\usepackage{dcolumn}
+\usepackage{pdfpages}
+\usepackage{listings}
+\usepackage[autostyle, english = american]{csquotes}
+
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+%%% CUSTOM COMMANDS %%%
+\def\ci{\perp\!\!\!\perp} % statistical independence symbol
+\def\nci{\perp\!\!\!\!\!\!\diagup\!\!\!\!\!\!\perp}
+\newcommand{\ind}{1\hspace{-2.1mm}{1}} % indicator function
+\newcommand{\rl}{\mathbb{R}} % real numbers
+\newcommand{\ex}[1]{\mathbb{E} \left[ #1 \right]} % expectation operator
+\newcommand{\pr}[1]{\mathbb{P} \left( #1 \right)} % probability
+\newcommand{\var}[1]{\mathbb{V}\text{ar} \left[ #1 \right]} % variance
+\newcommand{\cov}[1]{\mathbb{C}{ov} \left[ #1 \right]} % covariance
+\newcommand{\corr}[1]{\mathbb{C}{orr} \left[ #1 \right]} % correlation
+\newcommand{\tab}{\hspace{.4cm}}
+\newcommand{\lra}{\text{ }\Leftrightarrow\text{ }}
+\newcommand{\ra}{\text{ }\Rightarrow\text{ }}
+\newcommand{\la}{\text{ }\Leftarrow\text{ }}
+\newcommand{\veps}{\varepsilon}
+\newcommand{\spc}{\text{ }}
+
+
+%%% SET FONT %%%
+\renewcommand{\familydefault}{\sfdefault}
+\linespread{1.2}
+\setlength{\parindent}{0pt}
+\usepackage{sfmath}
+\titleformat*{\section}{\normalsize\bfseries}
+\titleformat*{\subsection}{\normalsize\bfseries}
+\titleformat*{\subsubsection}{\normalsize\bfseries}
+\titleformat*{\paragraph}{\normalsize\bfseries}
+\titleformat*{\subparagraph}{\normalsize\bfseries}
+
+%%% SET INDENT %%%
+\setlength\parindent{24pt}
+
+
+\begin{document}
+{\fontfamily{cmr}\selectfont
+
+
+\title{\vskip-1cm \small The University of Chicago /  Winter 2016\footnote{This document was updated on \today.} \\
+\Large Winter Quarter Rough Draft \vskip-.2cm}
+\author{\normalsize Adam Sudit}
+\date{February 2017}
+\maketitle
+
+\section{Introduction}
+\section{Statement of the Research Question}
+During times of financial panic, what is the effect of bank distress on mnaufacturing output? The research question is magnified to: during the Great Depression, what was the effect of bank distress on plant-level output in the cotton goods industry?
+\section{Literature Review}
+
+\indent Conventional wisdom has been that monetary channels are the main way in which a financial crisis affects real economic activity. In particular, many thought that bank distress depresses the economy by decreasing the supply of money (Friedman and Schwartz 1963). Even so, this theory cannot fully explain the prodigious decline in output during the Great Depression, among other flaws. Bernanke (1983) redefined the economic literature by showing that while monetary channels are important to establishing a causal connection between bank distress and economic activity, non-monetary channels have a significant role to play as well. His key idea is that of the cost of intermediation in incomplete markets; as the transaction costs inherent to an incomplete market like bank lending increase in the wake of financial panic, the acquisition of credit become prohibitively expensive. As Bernanke then points out (pg.21), aggeregate demand of the household must then decrease, in turn causing aggregate output to plummet. Bernanke asserts that this theory better explains the severity of the Great Depression. Even so, one important flaw in his theory is that it does not disaggregate supply effects from demand effects within the lending channel, the mechanism through which credit is passed from a lender to a borrower. Indeed, a bank may choose to not extend credit during a financial crisis not because of weakening financial health on the part of the bank, but because ailing borrowers make for a poor return on investment. This reverse casuality could cause Bernanke's results to be overstated. Calomiris and Mason (2003) attempt to circumvent this issue by instrumenting for loan supply and exploiting cross-state variation in state-level influences on lending channels to robustly identify the casual link between bank distress and growth in state-level income. 
+\\
+\indent The analysis of the effects of bank distress on real economic activity has not been restricted to the Great Depression. One group of papers in the literature use natural experiments to identify exogenous shocks to lending channels. Peek and Rosengren (2000), for example, measure the effect of a shock within the Japanese banking sector on commercial real estate markets within the United States. Similarly, Ashcraft (2005) measure the effect of small bank closures on local economic outcomes in Texas, by using the fact that each local bank suspension was independent of the health of the local economy, and instead tied to FDIC measures on a state level. In both cases though, the studies were restricted to the effect of lending shocks to local markets or economies.
+\\
+\indent A more recent body of literature has exploited the availability of firm-level data to account for various unobservable influences within the lending channel. Khwaja and Mian (2008) employ a new empirical strategy in which changes in loan allocation to a specific borrowing firm are compared across banks affected to varying degrees by liquidity shocks, in order to isolate supply effects from demand effects within each firm. They find that a firm's ability to obtain loans from alternative sources in the wake of a liquidity shock affects the extent to which a firm subsequently declines; indeed, for this reason smaller firms are worse off than larger firms when a liquidity shock occurs. Chodorow-Reich (2014) finds that the ability of a firm to obtain credit in the wake of the collapse of Lehman Brothers directly influenced uemployment outcomes within those firms. Firms that had access to credit from healthier lenders before the collapse did not lay off as many employees, relative to firms with access to credit from less financially stable lenders. Greenstone et. al (2015) do not find a statistically significant negative effect of shocks to small business loans on the economy. 
+\\
+\indent One of the salient themes within the literature is the notion that smaller firms should be more adversely affected by shocks to the financial sector than larger firms. Bernanke (1983) captures this intuition with his concept of the cost of credit intermediation, as mentioned previously. Bernanke, Gertler, and Gilchrist (1994) further develop the theory with the idea of a financial accelerator, in which relatively small shocks to the economy can be exacerbated by the market for credit. They show that when borrowers cannot obtain credit outside of the firm (external financing) in the wake of one of these shocks, they experience decreases in output. This scenario tends to befall smaller firms, since as Chodorow-Reich (2014) observes, smaller firms tend to have less capital on hand to maintain daily operations in the absence of lending channels. Further, lending to smaller firms with less of a credit history than larger firms poses an asymmetric problem that requires costly monitoring regimes. The potential costs of lending to smaller firms is only made worse during an economic crisis, in which the probability of those very firms defaulting increases as their balance sheet health deteriorates, causing lenders to flock to safer investments and making borrowing more expensive (again, see Bernanke et. al's (1994), especially the concept of ``flight to quality" ).
+\\
+\indent This paper seeks to contribute to the literature by extending Calomiris and Mason's inuition to plant-level data from the Census of Manufacturers, from 1929-1936. My identification strategy relies on cross-county heterogeienity in bank health and solvency outcomes, along with the insight that the demand for credit by county-level manufacturing plants most likely did not have an economically significant effect on bank health on the county, state, and national level. Previous papers that use firm or plant-level data to this effect during the Great Depression include Ziebarth (2013), Lee and Mezzanotti (2014), and Nanda et. al (2014). 
+
+\section{Data Sources}
+\indent The principal source of data comes from the U.S. Census of Manufacturers, for 1929, 1931, 1933, and 1935. In particular, the data is for the Cotton Goods Industry. The census has plant-level data for 1508 unique plants across the United States. The dataset is taken to be exhaustive of all firms in the cotton goods industry , since there are indicator variables for each plant indicating whether they were open in each year spanning the dataset. In order to balance the data, I create additional observations for each firm for years in which the firm did not exist, or had closed. For years before a firm opened, I create a firm-year observation filled with missing values. For years following a firm closure, I create firm-year observations filled with zeros. I use the Census data for my firm-level measures of capital, labor, and output. 
+\\
+\indent The second source of data is bank data from the Federal Deposit Insurance Corporation (FDIC) from 1920-1936. It has county-level information on the number of banks suspended, the number of deposits of suspended and non-suspended banks, and the total number of banks. The FDIC data is quite useful because it has data on all banks, regardless of if they were part of the Federal Reserve System or not (as Nanda notes?). I construct a time-varying measure of bank distress on the county level from the FDIC data on both bank suspensions and total number of banks:
+\begin{align*}
+BankDistress_{c, t} = \frac{BankSuspensions_{c, t}} {Banks_{c, 1929}}
+\end{align*}
+While my measure is based on previous the literature (see Nanda et. al (2014)), I create a time-varying measure, instead of a fixed county-characteristic from 1930-1933. The number of bank suspensions in a given county-year is normalized by the number of counties in 1929 to make the measure meaningful across different counties. As will be seen in the model section, this measure of bank distress is used as a shock to firm production. The shock is introduced after 1929, since as Calomiris and Mason (2000) note, Friedman and Schwartz (1963) identify the first major banking panic as occurring in October of 1930.  
+\\
+\indent After formatting the FDIC from wide to long, I then create a merged dataset by merged the census data with the FDIC data by county, state, and year. 
+\\
+\indent The last data source is the Consumer Price Index (CPI). Since my measures of capital and output are in nominal terms, I normalize them using the CPI. 
+
+\section{Model}
+
+
+\indent Before examining the main empriical specification, consider the following graphs which show capital and labor plotted against the bank distress variable: 
+\begin{figure}[!htb]
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth, angle=0]{"/Users/Adam/Research/BA_Thesis/Graphs/Capital vs Var Interest".pdf}
+\endminipage\hfill
+\minipage{0.5\textwidth}
+  \includegraphics[width=\linewidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Labor vs Var Interest".pdf}
+\endminipage
+\end{figure}
+
+On the surface, there appears to be a negative relationship between both capital and labor and the level of bank distress in a given county during a given year. This is further explored in the following models.
+
+
+\subsection{Main Specification}
+
+To measure the effects of bank distress on output, we run the following fixed-effects regression:
+\begin{align*}
+y_{it} = \beta_0 After\_1929 x BankDistress_{c,t} + \beta_1 l_{it} + \beta_2 k_{it} + \alpha_c + \gamma_t + \epsilon
+\end{align*}
+$After_1929$ is an indicator variable for whether a given observation is before the bank shock or after. The indicator variable then interacts with the measure of bank distress so that the bank shock is introduced at the correct time within the panel. This interaction effects formulation is based on Nanda et. al (2014) and Lee and Mezzanotti (2014). I use production estimation under the assumption of a Cobb-Douglas production function to control for within-firm influences on output. County and year-fixed effects are included as well. Standard errors are then clustered by county using heteroscedasticity-consistent standard errors. 
+
+\subsection{Probit}
+
+One interesting variable within the Census of Manufacturers is an indicator variable of whether a firm was open or closed in 1935, the end of the sample. To examine the effect of bank distress on firm closures, I also run the following probit model:
+\begin{align*}
+Pr(Open 1935 = 1 | Open 1929) = \beta_0 + \beta_1 After\_1929 x BankDistress_{c,t} + \beta_2 l_{it} + \beta_3  k_{it} + \epsilon
+\end{align*}
+
+Fixed effects are not included, since fixed effects estimators in dicrete choice models tend to be highly biased (see Greene(2002)). The same variable of interest and interaction term is included, along with labor and capital to control for within-firm determinants of plant closure. Standard errors are again clustered by county using heteroscedasticity-consistent standard errors. 
+
+\subsection{Simplified Specification}
+
+For simplicity I also run a similar model to the main specification, with only two periods for each firm: a pre-banking shock period and a post-banking shock period. I divide the sample into observations in 1929, all observations after 1929. All regression variables in the post-1929 sample are then aggregated by plant, including the bank distress variable of interest, since it has a common denominator across years. I then run the following regression:
+\begin{align*}
+y_{it} = \beta_0 After\_1929 x BankDistress_{c,t} + \beta_1 l_{it} + \beta_2 k_{it} + \alpha_c  + \epsilon
+\end{align*}
+
+\section{Robustness Checks}
+
+\subsection{Reverse Casuality}
+
+There is a major potential pitfall in my identification strategy: I am assuming that bank distress affects firm output, and not other way around. It is conceivable that in general, reverse casuality is present. I argue that this is not a major concern for this study. A firm's declining output could precede it becoming illiquid, causing them to default on their loan payemnts to a bank. If this happened multiple times to various firms that borrowed from one bank, a bank's debt would drastically increase, to the point that they are forced to go bankrupt or suspend operations. But the firms I am considering in this paper are relatively small, and our model measures the effect of all suspensions in a given county on the output of one firm. It is unlikely that a loan to a small business would make up enough of a bank's balance sheet, let alone all county banks' balances sheets, so that if that business were to fail, it would cause the bank's liabilities to rise to unsustainable levels and lead to insolvency. 
+\\
+\indent In order illustrate this intuition empriically, we run the following robustness checks:
+\begin{align*}
+After\_1929 x BankDistress_{c,t} = \beta_0  + \beta_1 y_{it} + \beta_2 l_{it} + \beta_3 k_{it} + \alpha_c + \gamma_t + \epsilon
+\end{align*}
+After controlling for plant capital and labor levels, along with time and county fixed effects, we want to measure the effect of firm output on bank distress after 1929, when the banking shocks occur. To see if firm output in 1929 can predict subsequent bank failures, I also run the following robustness check:
+\begin{align*}
+BankSuspensions_c  =  \beta_0+ \beta_1 y_{i, 1929} + \beta_2 l_{i, 1929} + \beta_3 k_{i, 1929} + \alpha_c  + \epsilon
+\end{align*}
+
+Where $BankSuspensions_c$ are all bank suspensions that occurred after 1929 in the sample for a given county, and labor, capital, and output are from 1929. 
+
+\section{Findings}
+
+\section{Conclusion}
+
+\section{Directions for Further Work}
+
+\indent The main direction for further work is getting more robust results. As of now, I have relatively high standard errors. I hope to find a specification that is better for my small sample size. Originally, I ran differenced fixed effects models, but my sample size was too small to make it work well.
+\\
+\indent I also might incorporate data from the automobile industry into my sample, and run the same models but with indistry fixed effects. The auto manufacturing data is quite small though, so I'm unsure how helpful it will be to add to my sample. 
+\\
+\indent If I have time, I would also like to create a motivating theoretical model that better illustrates the mechanism through which bank distress affects firm output. At the same time, I want to the model to illustrate why reverse casuality is not an issue here. Below is my preliminary work on the model:
+
+\subsection{Motivating Model}
+
+\indent I borrow heavily from Bernanke (1983) and Bernanke and Gilchrist(1995). The goal is to indentify as robustly as possible the lending channel between lenders (banks) and borrowers (manufacturing firms), in times of economic crisis. Consider a world of borrowers and lenders. In a world of assymmetric information, lenders such as banks provide a key function -- they undergo the costly process of identifying good borrowers, those who are likely to use loans productively and provide a return on investment greater than the cost of providing the loan, and bad borrowers, who do the opposite. Banks are the intermediaries that channel funds from investors or savers to good borrowers. The cost of lending to good borrowers, is known as the cost of credit indermediation (CCI) (Bernanke). Associated costs include auditing of potential borrowers, and conducting audits of those who have received loans. The cost of credit intermediation is a non-monetary channel through which panics can affect real economic activity.
+\\ 
+\indent Bernanke has decsribed two components of economic panics that can raise the CCI, making it difficult and costly for firms to obtain credit. The first is the effect of banking crisis on the CCI. This includes declining balance sheet health, bank runs on deposits, and bank suspensions. All of this leads to a decrease in the supply of credit. The second component is the effect of borrower bankrupticies on the CCI. Bernanke considers a world of incomplete markets, in which creating lending contracts that account for all possible future states of the world is costly and infeasible. Simple loan agreements are made, since they are less expensive. In the abscence of costly, complex loan agreements, collateral is an essential way in which banks lower the risk of making loans. Bernanke notes that the Great Depression from 1930-1933 can be thought of as the\"progressive erosion of borrowers collateral relative to debt burdens" (pg. 19 in PDF). When a borrower's collateral deteriorates in the event of economic collapse, the CCI increases, since the risk of a firm becoming insolvent increases. In many scenarios, banks will then 'fly to quality". While alternative forms of financing exist for a firm, it is still costly to secure loans from these sources of financing. Bernanke (1983) notes that during the greater depression, smaller households and companies had the most dependence on loans from banks (pg. 17 in PDF), and thus were the mostly adversely affeced. This will be important to our analysis later. 
+\\ \\ 
+We need to a tractable way to impose financial constraints into the economy. Consider banks first. Based on the Bernanke-Blinder (1988) (Bernanke and Gilchrist 1995, pg 21 in PDF), we can reasonably assume that during the Great Depression, banks faced a constraint on how easily they could obtain new deposits. Based on Khwaja-Mian (2008), consider the following loan transaction. Assume for simplicity that a firm i receives loans from only one bank, bank j. Both the bank and firm live for 2 periods, and engage in a loan each period. In period t, the bank and the firm negociate a loan $L_{ij}^t$. To finance the loan, the bank raises deposits $D_i^t$, but as mentioned, it becomes costly to raise deposits past some level $D_i^t \leq \bar{D}$. Banks can also raise funds outside of deposits, $B_i^t$, but face a per unit cost of $\alpha_B$ in doing so. Lastly, assume that the share of bank i's funds that go into the loan for firm j is $\gamma_j$. So we have the following accounting equation:
+\begin{align*}
+L_{ij}^t = \gamma_j (B_i^t + D_i^t)
+\end{align*}
+In an incomplete market with assymetric information, there are transaction costs associated with making the loan. The bank must audit the firm's finances and assess the riskiness of the loan, and continue to monitor the firm as it makes loan repayments in the future. We can call this the cost of credit intermediation (CCI-Bernanke 1983), denoted as a per unit cost of $\alpha_L$. If a bank expects a return in period t+1 from the firm of $r_j^{t+1}$, then first order conditions tell us marginal cost of making a loan equals marginal benefit, and so we have the following identity:
+\begin{align*}
+r_j^{t+1} = \gamma_j \alpha_B B_i^t + \alpha_L L_{ij}^t
+\end{align*}
+
+We now turn to the firm. \iffalse The firm has two sources of funding -- loans from bank j, $L_{ij}^t$, and external financing, $E_{ij}^t$. External financing requires connections with other investors, and higher levels of collateral. So suppose only large firms are able to find external financing, and then access to external financing by firm j is given by $\mathds{1}_{Large firm} E_{ij}^t$. \fi Firm j has output from earlier in period t of $Y_j^t$ (firms produce at beginning of each period). Assume that demand for firm j output in period t is exogenously given by $Q_t$, where the firm j knows what demand will be at the beginning of each period. In a competitive market then, $Y_j^t = Q_t$. If firm j receives a loan $L_{ij}^t$, then they have the following budget constraint going into period t+1:
+\begin{align*}
+L_{ij}^t + \iffalse \mathds{1}_{Large firm} E_{ij}^t +\fi Q_t = K_j^{t+1} + L_j^{t+1} + r_j^{t+1}
+\end{align*}
+
+
+
+\section{Bibliography}
+\section{Appendix}
+
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Sat, Feb 25, 2017 - 16:18:02
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Fixed Effects Models} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{2}{c}{\textit{Dependent variable: Total Value Added}} \\ 
+\cline{2-3} 
+\\[-1.8ex] & \multicolumn{1}{c}{} & \multicolumn{1}{c}{ } \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{Without clustering}} & \multicolumn{1}{c}{\textit{With clustering}} \\ 
+ & \multicolumn{1}{c}{\textit{}} & \multicolumn{1}{c}{\textit{}} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\ 
+\hline \\[-1.8ex] 
+ Post\_1929 & 1,842.725^{**} & 1,842.725 \\ 
+  & (938.955) & (1,156.081) \\ 
+  & & \\ 
+ BankDistress & 8,403.473^{***} & 8,403.473 \\ 
+  & (2,837.277) & (6,873.815) \\ 
+  & & \\ 
+ labor & 5.660^{***} & 5.660^{***} \\ 
+  & (0.143) & (0.342) \\ 
+  & & \\ 
+ capital & 1.122^{***} & 1.122^{***} \\ 
+  & (0.016) & (0.050) \\ 
+  & & \\ 
+ factor(Year)1931 & -2,278.331^{*} & -2,278.331 \\ 
+  & (1,177.240) & (1,575.049) \\ 
+  & & \\ 
+ factor(Year)1933 & -270.293 & -270.293 \\ 
+  & (1,100.379) & (1,428.646) \\ 
+  & & \\ 
+ factor(Year)1935 & -4,547.199^{***} & -4,547.199^{***} \\ 
+  & (1,040.571) & (1,217.462) \\ 
+  & & \\ 
+ Post\_1929*BankDistress & -8,126.486 & -8,126.486 \\ 
+  & (5,397.212) & (7,382.870) \\ 
+  & & \\ 
+\hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{5,207} &  \\ 
+R$^{2}$ & \multicolumn{1}{c}{0.955} &  \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.952} &  \\ 
+Residual Std. Error & \multicolumn{1}{c}{21,161.700 (df = 4913)} &  \\ 
+F Statistic & \multicolumn{1}{c}{354.556$^{***}$ (df = 294; 4913)} &  \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table} 
+
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Sat, Feb 25, 2017 - 16:30:20
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Probit Model} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{2}{c}{\textit{Dependent variable: Open in 1935 (binary variable)}} \\ 
+\cline{2-3} 
+\\[-1.8ex] & \multicolumn{1}{c}{} & \multicolumn{1}{c}{ } \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{Without clustering}} & \multicolumn{1}{c}{\textit{With clustering}} \\ 
+ & \multicolumn{1}{c}{\textit{}} & \multicolumn{1}{c}{\textit{}} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\ 
+\hline \\[-1.8ex] 
+ Post\_1929 & 1.321^{***} & 1.321^{***} \\ 
+  & (0.047) & (0.065) \\ 
+  & & \\ 
+ BankDistress & 0.352^{***} & 0.352^{*} \\ 
+  & (0.135) & (0.207) \\ 
+  & & \\ 
+ labor & 0.00001 & 0.00001 \\ 
+  & (0.00002) & (0.00004) \\ 
+  & & \\ 
+ capital & 0.00001^{***} & 0.00001^{***} \\ 
+  & (0.00000) & (0.00000) \\ 
+  & & \\ 
+ Post\_1929*BankDistress & -0.718^{**} & -0.718 \\ 
+  & (0.323) & (0.572) \\ 
+  & & \\ 
+ Constant & -0.584^{***} & -0.584^{***} \\ 
+  & (0.036) & (0.064) \\ 
+  & & \\ 
+\hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{4,820} &  \\ 
+Log Likelihood & \multicolumn{1}{c}{-2,307.301} &  \\ 
+Akaike Inf. Crit. & \multicolumn{1}{c}{4,626.603} &  \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table} 
+
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Sat, Feb 25, 2017 - 19:14:55
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Fixed Effects -- Two Period Model} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{2}{c}{\textit{Dependent variable: Total Value Added}} \\ 
+\cline{2-3} 
+\\[-1.8ex] & \multicolumn{1}{c}{Without Clustering} & \multicolumn{1}{c}{With Clustering} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{\textit{}} & \multicolumn{1}{c}{\textit{}} \\ 
+ & \multicolumn{1}{c}{\textit{}} & \multicolumn{1}{c}{\textit{}} \\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\ 
+\hline \\[-1.8ex] 
+ Post\_1929 & 515.813 & 515.813 \\ 
+  & (1,469.060) & (1,718.132) \\ 
+  & & \\ 
+ BankDistress & 13,988.430^{**} & 13,988.430 \\ 
+  & (5,862.418) & (11,060.750) \\ 
+  & & \\ 
+ Capital & 1.257^{***} & 1.257^{***} \\ 
+  & (0.019) & (0.051) \\ 
+  & & \\ 
+ Labor & 4.775^{***} & 4.775^{***} \\ 
+  & (0.160) & (0.359) \\ 
+  & & \\ 
+ Post\_1929 * BankDistress & -11,762.620^{**} & -11,762.620 \\ 
+  & (5,861.229) & (9,687.415) \\ 
+  & & \\ 
+\hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{2,528} &  \\ 
+R$^{2}$ & \multicolumn{1}{c}{0.979} &  \\ 
+Adjusted R$^{2}$ & \multicolumn{1}{c}{0.976} &  \\ 
+Residual Std. Error & \multicolumn{1}{c}{30,654.210 (df = 2245)} &  \\ 
+F Statistic & \multicolumn{1}{c}{369.493$^{***}$ (df = 283; 2245)} &  \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table}
+
+}
+
+\end{document}
