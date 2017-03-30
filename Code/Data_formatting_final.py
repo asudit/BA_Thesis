@@ -1,7 +1,8 @@
 # for ease of use in interpreter: exec(open("/Users/Adam/Research/BA_Thesis/Code/Data_formatting_final.py").read())
 
 
-import xlrd, numpy as np
+import xlrd, numpy as np, csv
+from Levenshtein import distance
 
 ICSPR_state_codes = {41 : 'ALABAMA',
 81 : 'ALASKA',
@@ -145,6 +146,7 @@ del fdic_df_long['YEAR']
 
 #rename states
 fdic_df_long['ICPR STATE CODE'] = fdic_df_long['ICPR STATE CODE'].apply(lambda x: ICSPR_state_codes[int(x)].lower())
+fdic_df_long=fdic_df_long.rename(columns = {'COUNTY NAME':'County', 'ICPR STATE CODE': 'State'})
 
 #################################################### Now, we have to convert the fips code in debt_df to county and state columns#########################################################
 
@@ -197,11 +199,70 @@ debt_df['FIPS code'] = new_fips
 merged_debt_df = pd.merge(fips_df, debt_df[['FIPS code', 'change in mortgage debt per acre, 1920-1910']], how='inner', on='FIPS code')
 merged_debt_df=merged_debt_df.rename(columns = {'change in mortgage debt per acre, 1920-1910':'debt'})
 
-
+'''
 excel_test_path = '/Users/Adam/Research/BA_Thesis/Data final/rajan_data.xlsx'
 writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
 merged_debt_df.to_excel(writer, 'Sheet1')
 writer.save()
+'''
+##################################################### fix county names in ziebarth data #################################################
+
+fips_df['county'] = fips_df['county'].apply(lambda x: str(x).lower())
+merged_debt_df['county'] = merged_debt_df['county'].apply(lambda x: str(x).lower())
+
+us_counties = list(fips_df['county'])
+#us_counties = list(fdic_df_long['County'].apply(lambda x: str(x).lower()))
+
+
+county_cleaning_path = '/Users/Adam/Research/BA_Thesis/Data/County cleaning for Nick.xlsx'
+#county_cleaning_df = pandas.read_excel(county_cleaning_path, sheet = 'Sheet1')
+
+#county_cleaning_df['county'] = county_cleaning_df['county'].apply(lambda x: str(x).lower())
+
+workbook = xlrd.open_workbook(county_cleaning_path)
+sheet = workbook.sheet_by_name('Sheet1')
+row_list = []
+for row_num in list(range(sheet.nrows)):
+	if row_num == 0:
+		pass
+	else:
+		row = sheet.row_values(row_num)
+		if row[2].lower() not in us_counties:
+			missing = 1
+		else:
+			missing = 0
+		new_row = row + [missing]
+	row_list.append(new_row)
+
+
+with open('/Users/Adam/Research/BA_Thesis/Data/County cleaning.csv', "w") as f:
+	writer = csv.writer(f)
+	for row in row_list:
+		writer.writerow(row)
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
