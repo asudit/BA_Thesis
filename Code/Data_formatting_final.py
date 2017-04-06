@@ -292,7 +292,7 @@ county_cleaning_path = '/Users/Adam/Research/BA_Thesis/Data/Rajan County Cleanin
 #county_cleaning_df = pandas.read_excel(county_cleaning_path, sheet = 'Sheet1')
 
 #county_cleaning_df['county'] = county_cleaning_df['county'].apply(lambda x: str(x).lower())
-
+'''
 workbook = xlrd.open_workbook(county_cleaning_path)
 sheet = workbook.sheet_by_name('Sheet1')
 row_list = []
@@ -333,6 +333,75 @@ with open('/Users/Adam/Research/BA_Thesis/Data/Rajan county cleaning.csv', "w") 
 		writer.writerow(row)
 	
 #difflib.get_close_matches(word, possibilities, n=3
+'''
+
+
+##############################################use county cleaning csv's to update the dataframe #################
+Rajan_clean_csv_path = '/Users/Adam/Research/BA_Thesis/Data final/Rajan county cleaning -- Don\'t change.csv'
+ziebarth_clean_csv_path = '/Users/Adam/Research/BA_Thesis/Data final/County cleaning-Don\'t change.csv'
+
+with open(Rajan_clean_csv_path, "r") as f:
+	rows = csv.reader(f)
+	for row in list(rows)[1:]:
+		new_county = row[5].lower().rstrip()
+		if new_county != '':
+			FIPS_Code = row[3]
+			#print(new_county, FIPS_Code)
+			merged_debt_df.loc[merged_debt_df['FIPS code'] == int(FIPS_Code), 'county'] = new_county
+
+with open(ziebarth_clean_csv_path, "r", encoding='mac_roman') as f:
+	rows = csv.reader(f)
+	for row in list(rows)[1:]:
+		new_county = row[7].lower().rstrip()
+		if new_county != '':
+			firm_Code = row[3]
+			Year = row[5]
+			census_df.loc[(census_df['Establishment ID composed of IndNum and random sequence of 10 letters'] == firm_Code) & (census_df['Year'] == Year), 'County'] = new_county
+
+
+####################################### standardize headers and prepare for merge ######################################################
+merged_debt_df=merged_debt_df.rename(columns = {'state':'State', 'county':'County', 'year': 'Year'})
+census_df=census_df.rename(columns = {'Establishment ID composed of IndNum and random sequence of 10 letters': 'firm code'})
+
+#convert debt df states to full states
+merged_debt_df['State'] = merged_debt_df['State'].apply(lambda x: states[str(x)].lower())
+merged_debt_df['County'] = merged_debt_df['County'].apply(lambda x: str(x).lower())
+
+census_df['County']  = census_df['County'].apply(lambda x: str(x).lower())
+census_df['State']  = census_df['State'].apply(lambda x: str(x).lower())
+census_df['Year']  = census_df['Year'].apply(lambda x: int(x))
+
+fdic_df_long['County'] = fdic_df_long['County'].apply(lambda x: str(x).lower())
+fdic_df_long['State'] = fdic_df_long['State'].apply(lambda x: str(x).lower())
+fdic_df_long['Year'] = fdic_df_long['Year'].apply(lambda x: int(x))
+
+census_fdic_merged_df = pd.merge(census_df, fdic_df_long, how='inner', on=['Year', 'State', 'County'])
+merge_final_df = pd.merge(census_fdic_merged_df, merged_debt_df, how='inner', on=['State', 'County'])
+
+
+excel_test_path = '/Users/Adam/Research/BA_Thesis/Data final/merged_data.xlsx'
+writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
+merge_final_df.to_excel(writer, 'Sheet1')
+writer.save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ################################## other cleaning in ziebarth data ############################
 
