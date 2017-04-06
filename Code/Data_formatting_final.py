@@ -3,6 +3,7 @@
 
 import xlrd, numpy as np, csv
 from Levenshtein import distance
+from difflib import get_close_matches
 
 ICSPR_state_codes = {41 : 'ALABAMA',
 81 : 'ALASKA',
@@ -32,7 +33,7 @@ ICSPR_state_codes = {41 : 'ALABAMA',
 64 : 'MONTANA' ,
 35 : 'NEBRASKA', 
 65 : 'NEVADA' ,
-4 : 'NEW HAMSHIRE' ,
+4 : 'NEW HAMPSHIRE' ,
 12 : 'NEW JERSEY' ,
 66 : 'NEW MEXICO' ,
 13 : 'NEW YORK',
@@ -51,10 +52,70 @@ ICSPR_state_codes = {41 : 'ALABAMA',
 6 : "VERMONT",
 40 : "VIRGINIA", 
 73 : "WASHINGTON",
-56 : "WEST VIRGINA",
+56 : "WEST VIRGINIA",
 25 : "WISCONSIN",
 68 : "WYOMING", 
 55 : 'DISTRICT OF COLUMBIA'}
+
+states = {
+        'AK': 'Alaska',
+        'AL': 'Alabama',
+        'AR': 'Arkansas',
+        'AS': 'American Samoa',
+        'AZ': 'Arizona',
+        'CA': 'California',
+        'CO': 'Colorado',
+        'CT': 'Connecticut',
+        'DC': 'District of Columbia',
+        'DE': 'Delaware',
+        'FL': 'Florida',
+        'GA': 'Georgia',
+        'GU': 'Guam',
+        'HI': 'Hawaii',
+        'IA': 'Iowa',
+        'ID': 'Idaho',
+        'IL': 'Illinois',
+        'IN': 'Indiana',
+        'KS': 'Kansas',
+        'KY': 'Kentucky',
+        'LA': 'Louisiana',
+        'MA': 'Massachusetts',
+        'MD': 'Maryland',
+        'ME': 'Maine',
+        'MI': 'Michigan',
+        'MN': 'Minnesota',
+        'MO': 'Missouri',
+        'MP': 'Northern Mariana Islands',
+        'MS': 'Mississippi',
+        'MT': 'Montana',
+        'NA': 'National',
+        'NC': 'North Carolina',
+        'ND': 'North Dakota',
+        'NE': 'Nebraska',
+        'NH': 'New Hampshire',
+        'NJ': 'New Jersey',
+        'NM': 'New Mexico',
+        'NV': 'Nevada',
+        'NY': 'New York',
+        'OH': 'Ohio',
+        'OK': 'Oklahoma',
+        'OR': 'Oregon',
+        'PA': 'Pennsylvania',
+        'PR': 'Puerto Rico',
+        'RI': 'Rhode Island',
+        'SC': 'South Carolina',
+        'SD': 'South Dakota',
+        'TN': 'Tennessee',
+        'TX': 'Texas',
+        'UT': 'Utah',
+        'VA': 'Virginia',
+        'VI': 'Virgin Islands',
+        'VT': 'Vermont',
+        'WA': 'Washington',
+        'WI': 'Wisconsin',
+        'WV': 'West Virginia',
+        'WY': 'Wyoming'
+}
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -148,12 +209,16 @@ del fdic_df_long['YEAR']
 fdic_df_long['ICPR STATE CODE'] = fdic_df_long['ICPR STATE CODE'].apply(lambda x: ICSPR_state_codes[int(x)].lower())
 fdic_df_long=fdic_df_long.rename(columns = {'COUNTY NAME':'County', 'ICPR STATE CODE': 'State'})
 
+#######west virginia spelled wrong in fdic_df_long#########
+#for index, row in fdic_df_long.iterrows():
+	#if row['State'] == 'west virgina':
+		#print('gotcha!')
+		#fdic_df_long.ix[index, 'State'] = 'west virginia'
+
 #################################################### Now, we have to convert the fips code in debt_df to county and state columns#########################################################
 
 fips_df = pd.read_csv(fips_path, sep=',', header = None)
 fips_df.columns = ['state', 'state_code', 'county_code', 'county', 'class']
-
-
 
 
 def fix_fips(row):
@@ -210,11 +275,20 @@ writer.save()
 fips_df['county'] = fips_df['county'].apply(lambda x: str(x).lower())
 merged_debt_df['county'] = merged_debt_df['county'].apply(lambda x: str(x).lower())
 
-us_counties = list(fips_df['county'])
+#us_counties = list(fips_df['county'].astype(str))
+def make_county_state_dict(df):
+	state_county_dict = {}
+	for index, row in df.iterrows():
+		if row['State'] not in state_county_dict:
+			state_county_dict[row['State'].lower()] = []
+		state_county_dict[row['State']].append(row['County'].lower())
+	return state_county_dict
+state_county_dict = make_county_state_dict(fdic_df_long)
+
 #us_counties = list(fdic_df_long['County'].apply(lambda x: str(x).lower()))
 
 
-county_cleaning_path = '/Users/Adam/Research/BA_Thesis/Data/County cleaning for Nick.xlsx'
+county_cleaning_path = '/Users/Adam/Research/BA_Thesis/Data/Rajan County Cleaning.xlsx'
 #county_cleaning_df = pandas.read_excel(county_cleaning_path, sheet = 'Sheet1')
 
 #county_cleaning_df['county'] = county_cleaning_df['county'].apply(lambda x: str(x).lower())
@@ -227,24 +301,60 @@ for row_num in list(range(sheet.nrows)):
 		pass
 	else:
 		row = sheet.row_values(row_num)
-		if row[2].lower() not in us_counties:
+		state  = states[row[0]].lower()
+		if state == 'south carolina ':
+			state = 'south carolina'
+		#if state not in ['district of columbia','', 'wyoming'] and str(row[2]).lower() not in state_county_dict[state]:
+		if state not in ['alaska', 'district of columbia', 'hawaii', 'wyoming'] and str(row[2]).lower() not in state_county_dict[state]:
+			print('Ouch!')
 			missing = 1
+			bad_county = str(row[2]).lower()
+			#print(bad_county, us_counties)
+			#print(get_close_matches(bad_county, us_counties, n=1))
+			#correction = get_close_matches(bad_county, us_counties, len(us_counties), 0)
+			correction = []
+			for correct_county in state_county_dict[state]:
+				if distance(bad_county, correct_county) <= 2:
+					#if row[0] in states_dict:
+						#state_abbrev = states_dict[row[0]]
+					#if correct_county in state_county_dict[state_abbrev]:
+					correction.append(correct_county)
+			correction = [missing] + correction
 		else:
 			missing = 0
-		new_row = row + [missing]
-	row_list.append(new_row)
+			correction = [missing]
+		new_row = row + correction
+		row_list.append(new_row)
 
 
-with open('/Users/Adam/Research/BA_Thesis/Data/County cleaning.csv', "w") as f:
+with open('/Users/Adam/Research/BA_Thesis/Data/Rajan county cleaning.csv', "w") as f:
 	writer = csv.writer(f)
 	for row in row_list:
 		writer.writerow(row)
 	
+#difflib.get_close_matches(word, possibilities, n=3
 
+################################## other cleaning in ziebarth data ############################
 
+#####some new york is just n ################
+#for index, row in census_df.iterrows():
+	#if row['state'] == 'n':
+		#print('gotcha!')
+		#fdic_df_long.ix[index, 'state'] = 'new york'
 
-
-
+#other ziebarth exceptions: n for new york, new hempshire instead of new hampshire!, blanks for states, south carolina has a space at the end "south carolina "
+# "st." in city names --  take the period out of the st
+# parishes in county name -- issue? -- st john the baptist especially
+# arlington county VA not there, hernando FL, grays harbor, WA, ; alexandria, VA; drexel city in cass county and bates county, made it in bates county
+#some places have two counties ->/ ;; de witt vs deWitt;; made haleyville AL in marion county (in 2 counties
+# RADIOZLDXQDWJVL 1929 wront state -- should be kentucky; same with 118TVCMLLYDTJ 1935 should be NC not NY??
+# 119PAJRDVUYNW put in pettis county since in two counties
+# independent cities like st. louis dont have a county -> still making it st luois county; 118OLDKHJWCSR 1933 should be MO;
+# 122APOXATJSZD 1935 should be NJ not NY; BTTUQCNAJQ technically in greenville and anderson counties 
+# 118USMNJVOHNW 1929 should be North Dakota, not NC; same for 118WQJCLHLIPY 1929 and 118NIWRWPVBKX 1929 and 118QUHDJYIIMM 1929 and 118CWIKDINYXE 1929
+# and 118OVTQBVZLXI 1929 and 118PIGIDFHTRQ 1929 and 118MTSTKZOEQR 1929
+# 118JESCTMJCQN 1931 should be Colorado I think
+# i took out parish from all the county names in LA, and city from other county names in MO (st louis city) and VA (alexandria etc) -> maybe worth investigating later
 
 
 
