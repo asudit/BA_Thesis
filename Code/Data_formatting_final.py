@@ -378,11 +378,15 @@ fdic_df_long['Year'] = fdic_df_long['Year'].apply(lambda x: int(x))
 census_fdic_merged_df = pd.merge(census_df, fdic_df_long, how='inner', on=['Year', 'State', 'County'])
 merge_final_df = pd.merge(census_fdic_merged_df, merged_debt_df, how='inner', on=['State', 'County'])
 
-
+'''
 excel_test_path = '/Users/Adam/Research/BA_Thesis/Data final/merged_data.xlsx'
 writer = pd.ExcelWriter(excel_test_path, engine='xlsxwriter')
 merge_final_df.to_excel(writer, 'Sheet1')
 writer.save()
+'''
+
+####################################### now the fun begins ####################################################################
+
 
 
 
