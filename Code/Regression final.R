@@ -38,7 +38,11 @@ panel_original$industry_code <- as.character(panel_original$`Unnamed:.21`)
 panel_original <- sqldf('Select a.*, b.Industry, b.ext_finance FROM
                     panel_original AS a LEFT JOIN 
                   industry_data AS b ON (a.industry_code = b.industry_code)')
-
+#################################### CPI ##################
+#CPI <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/CPI Unadjusted,annual,index units.xlsx")
+#panel_original <- sqldf('Select a.*, b.CPI FROM
+                    #panel_original AS a LEFT JOIN 
+                  #CPI AS b ON (a.Year = b.Year)')
 ################################ lets get crackin #################################
 
 panel <- data.frame(panel_original[c('Year', 'County', 'firm.code', 'Value.of.product', 'varying_iv', 'fixed_char', 'open_29', 'Post_1929', 'debt',
@@ -71,15 +75,28 @@ panel$year <- as.factor(panel$Year)
 panel$post <- as.numeric(panel$Post_1929)
 panel$varying_iv <- as.numeric(panel$varying_iv)
 panel$industry <- as.factor(panel$Industry)
+#panel$CPI <- as.numeric(panel$CPI)
+
+#panel$y <- y/panel$CPI
 
 panel$varying_iv[27598] <- NA
 
-fixed_iv_model <- lm(y ~ post + fixed_char + post*fixed_char  + year + county + industry -1, data = panel)
-varying_iv_model <-lm(y ~ varying_iv + year -1, data = panel)
+#fixed_iv_model_y_noFixedEffects <- lm(y ~ post*fixed_char, data = panel)
+#fixed_iv_model_y_YearCounty <- lm(y ~ post*fixed_char  + year + county, data = panel)
+#fixed_iv_model_y <- lm(y ~ post*fixed_char  + year + county + industry, data = panel)
+
+#library(sandwich)
+#library(lmtest)
+#library(multiwayvcov)
+#fixed_iv_model_y_noFixedEffects <- coeftest(fixed_iv_model_y_noFixedEffects, vcov=vcovHC(fixed_iv_model_y_noFixedEffects,type="HC0",cluster="County"))
+#fixed_iv_model_y_YearCounty <- coeftest(fixed_iv_model_y_YearCounty, vcov=vcovHC(fixed_iv_model_y_YearCounty,type="HC0",cluster="County"))
+#fixed_iv_model_y <- coeftest(fixed_iv_model_y, vcov=vcovHC(fixed_iv_model_y,type="HC0",cluster="County"))
+
+#varying_iv_model <-lm(y ~ varying_iv + year, data = panel)
 #fixed_iv_model <- plm(y ~ post + fixed_char + post*fixed_char -1, data = panel, index = c('firm.code', 'Year'), model='within')
 #varying_iv_model <-plm(y ~ varying_iv, data = panel, index = c('firm.code', 'Year'), model='within')
-summary(fixed_iv_model)
-summary(varying_iv_model)
+#summary(fixed_iv_model)
+#summary(varying_iv_model)
 
 panel$labor <- rep(NA, 34207)
 
@@ -93,13 +110,20 @@ as.numeric(panel$Wage.earners.by.month..July) + as.numeric(panel$Wage.earners.by
 panel$labor[!is.na(panel$labor) & panel$labor > 0] <- log(panel$labor[!is.na(panel$labor) & panel$labor > 0])
 panel[mapply(is.infinite, panel)] <- NA
 
-fixed_iv_model_labor <- lm(labor ~ post*fixed_char  + year + industry + county -1, data = panel)
+fixed_iv_model_no_FixedEffects <- lm(labor ~ post*fixed_char, data = panel)
+fixed_iv_model_JustYearCounty <- lm(labor ~ post*fixed_char + year + county, data = panel)
+fixed_iv_model_labor <- lm(labor ~ post*fixed_char  + year + industry + county, data = panel)
 summary(fixed_iv_model_labor)
+varying_iv_model_labor <- lm(labor ~ varying_iv  + year + industry + county, data = panel)
+summary(varying_iv_model_labor)
 
 library(sandwich)
 library(lmtest)
 library(multiwayvcov)
-fixed_labor_robust <- coeftest(fixed_iv_model_labor, vcov=vcovHC(fixed_iv_model_labor,type="HC0",cluster="County"))
+fixed_iv_model_labor <- coeftest(fixed_iv_model_labor, vcov=vcovHC(fixed_iv_model_labor,type="HC0",cluster="County"))
+fixed_iv_model_no_FixedEffects <- coeftest(fixed_iv_model_no_FixedEffects, vcov=vcovHC(fixed_iv_model_no_FixedEffects,type="HC0",cluster="County"))
+fixed_iv_model_JustYearCounty <- coeftest(fixed_iv_model_JustYearCounty, vcov=vcovHC(fixed_iv_model_JustYearCounty,type="HC0",cluster="County"))
+varying_labor_robust <- coeftest(varying_iv_model_labor, vcov=vcovHC(varying_iv_model_labor,type="HC0",cluster="County"))
 
 ################################# make iv for robustness check  ############
 
@@ -113,29 +137,46 @@ panel_robust$debt <- as.numeric(panel_robust$debt)
 SLS1 <- lm(post*fixed_char ~ debt + year + county + industry, data = panel_robust, na.action=na.omit)
 summary(SLS1)
 X_hat <- fitted(SLS1)
-SLS2_labor <- lm(labor ~ X_hat + year + county + industry -1, data = panel_robust, na.action=na.omit)
+SLS2_labor <- lm(labor ~ X_hat + year + county + industry, data = panel_robust, na.action=na.omit)
 
 summary(SLS2_labor)
+#panel_robust$instrument <- X_hat
+
+#sign doesnt make sense...dont use
+#SLS1_varying <- lm(varying_iv ~ debt + year + county + industry, data = panel_robust, na.action=na.omit)
+#summary(SLS1_varying)
+#X_hat_varying <- fitted(SLS1_varying)
+#SLS2_labor_varying <- lm(labor ~ X_hat_varying + year + county + industry, data = panel_robust, na.action=na.omit)
+
+#summary(SLS2_labor_varying)
 
 library(sandwich)
 library(lmtest)
 library(multiwayvcov)
+SLS1_labor_robust <- coeftest(SLS1, vcov=vcovHC(SLS1,type="HC0",cluster="County"))
 SLS2_labor_robust <- coeftest(SLS2_labor, vcov=vcovHC(SLS2_labor,type="HC0",cluster="County"))
 
+#output?
+#SLS1_y <- lm(post*fixed_char ~ debt + year + county + industry, data = panel_robust, na.action=na.omit)
+#summary(SLS1_y)
+#X_hat <- fitted(SLS1_y)
+#SLS2_y <- lm(y ~ X_hat + year + county + industry, data = panel_robust, na.action=na.omit)
+#summary(SLS2_y)
+
 ##second IV
-panel_robust$debt_acre_1920 <- as.numeric(panel_robust$debt_acre_1920)
+#panel_robust$debt_acre_1920 <- as.numeric(panel_robust$debt_acre_1920)
 
-SLS1 <- lm(post*fixed_char ~ debt_acre_1920 + year + county + industry, data = panel_robust, na.action=na.omit)
-summary(SLS1)
-X_hat <- fitted(SLS1)
-SLS2_labor_IV2 <- lm(labor ~ X_hat + year + county + industry -1, data = panel_robust, na.action=na.omit)
+#SLS1 <- lm(post*fixed_char ~ debt_acre_1920 + year + county + industry, data = panel_robust, na.action=na.omit)
+#summary(SLS1)
+#X_hat <- fitted(SLS1)
+#SLS2_labor_IV2 <- lm(labor ~ X_hat + year + county + industry -1, data = panel_robust, na.action=na.omit)
 
-summary(SLS2_labor_IV2)
+#summary(SLS2_labor_IV2)
 
-library(sandwich)
-library(lmtest)
-library(multiwayvcov)
-SLS2_labor_IV2_robust <- coeftest(SLS2_labor_IV2, vcov=vcovHC(SLS2_labor_IV2,type="HC0",cluster="County"))
+#library(sandwich)
+#library(lmtest)
+#library(multiwayvcov)
+#SLS2_labor_IV2_robust <- coeftest(SLS2_labor_IV2, vcov=vcovHC(SLS2_labor_IV2,type="HC0",cluster="County"))
 
 ########################## external financing by industry ###########################
 #median is 0.04
@@ -144,20 +185,107 @@ low_ext_dependence <- subset(panel_robust, panel_robust$ext_finance <= 0.04)
 
 high_dep_SLS1 <- lm(post*fixed_char ~ debt  + year  + county + industry -1, data = high_ext_dependence, na.action=na.omit)
 summary(high_dep_SLS1)
-X_hat <- fitted(SLS1)
-SLS2_labor <- lm(labor ~ X_hat + year + county + industry -1, data = panel_robust, na.action=na.omit)
+X_hat <- fitted(high_dep_SLS1)
+high_dep_SLS2 <- lm(labor ~ X_hat + year + county + industry -1, data = high_ext_dependence, na.action=na.omit)
+summary(high_dep_SLS2)
+
+library(sandwich)
+library(lmtest)
+library(multiwayvcov)
+high_ext_dep_labor <- coeftest(high_dep_SLS2, vcov=vcovHC(high_dep_SLS2,type="HC0",cluster="County"))
+
+low_dep_SLS1 <- lm(post*fixed_char ~ debt  + year  + county + industry -1, data = low_ext_dependence, na.action=na.omit)
+summary(low_dep_SLS1)
+X_hat <- fitted(low_dep_SLS1)
+low_dep_SLS2 <- lm(labor ~ X_hat + year + county + industry -1, data = low_ext_dependence, na.action=na.omit)
+summary(low_dep_SLS2)
+
+library(sandwich)
+library(lmtest)
+library(multiwayvcov)
+low_ext_dep_labor <- coeftest(low_dep_SLS2, vcov=vcovHC(low_dep_SLS2,type="HC0",cluster="County"))
+
+############# WALD test #############
+# get variances of each model, after clustering at county level
+vcov_high=vcovHC(high_dep_SLS2,type="HC0",cluster="County")
+high_var <- vcov_high[c('X_hat', 'X_hat'),c('X_hat', 'X_hat')][1,1]
+high_coeff<- summary(high_dep_SLS2)$coefficients[1,]
+
+vcov_low=vcovHC(low_dep_SLS2,type="HC0",cluster="County")
+low_var <- vcov_low[c('X_hat', 'X_hat'),c('X_hat', 'X_hat')][1,1]
+low_coeff<- summary(low_dep_SLS2)$coefficients[1,]
+
+covar <- cov(high_coeff, low_coeff) #is this correct????
+
+se <- sqrt(high_var + low_var -2*covar)
+wald.z <- (summary(high_dep_SLS2)$coefficients[1,1] - summary(low_dep_SLS2)$coefficients[1,1])/se
+p_wald <- 2*pnorm(wald.z)
+
+################better approach###############
+panel$dependence_dummy <- ifelse((panel$ext_finance > 0.04), 1, ifelse(panel$ext_finance <= 0.04 , 0, 0))
+panel_robust$dependence_dummy <- ifelse((panel_robust$ext_finance > 0.04), 1, ifelse(panel_robust$ext_finance <= 0.04 , 0, 0))
+
+fixed_iv_model_labor_dependence <- lm(labor ~ dependence_dummy*post*fixed_char  + year  + county + industry, data = panel)
+
+SLS1_dependence <- lm(dependence_dummy*post*fixed_char ~ debt  + year  + county + industry, data = panel_robust, na.action=na.omit)
+summary(SLS1_dependence)
+X_hat <- fitted(SLS1_dependence)
+SLS2_dependence <- lm(labor ~ dependence_dummy*X_hat + year + county + industry, data = panel_robust, na.action=na.omit)
+summary(SLS2_dependence)
+
+library(sandwich)
+library(lmtest)
+library(multiwayvcov)
+fixed_iv_model_labor_dependence <- coeftest(fixed_iv_model_labor_dependence, vcov=vcovHC(fixed_iv_model_labor_dependence,type="HC0",cluster="County"))
+ext_dependence_model <- coeftest(SLS2_dependence, vcov=vcovHC(SLS2_dependence,type="HC0",cluster="County"))
 
 
-low_dep_labor <- lm(labor ~ post*fixed_char  + year + industry + county -1, data = low_ext_dependence)
-summary(low_dep_labor)
+
 
 #WALD test etc
+#dummy for high versus low - add dummy*X_hat as extra or interact with all other variables as well
 
+#heterogeniety analysis -- bunch of figures x axis financial dependence, and y axis coefficient of interest
+#
 
-########## fun with plots #######################
+########## fun with tables #######################
 #ggplot(data = panel, aes(x=panel$year, y=panel$labor))  + geom_point(aes(colour = factor(panel$industry)), size = 4)  + xlab("Year") + ylab("Labor") + ggtitle("Scatterplot of Labor During Great Depression by industry")
 
 #ggplot(data = Panel, aes(x=Panel$alt_iv, y=Panel$Total.cost.of.materials..fuel..and.electric.cost.sum.of.f001..f002..f003.))   + geom_point() +  stat_smooth(method = "lm", col = "red") + xlab("Bank Distress") + ylab("Capital") + ggtitle("Scatterplot of Capital vs. Bank Distress (with OLS fit line)")
 #ggplot(data = Panel, aes(x=Panel$alt_iv, y=Panel$Total.value.of.products))   + geom_point() +  stat_smooth(method = "lm", col = "red") + xlab("Bank Distress") + ylab("Output") + ggtitle("Scatterplot of Output vs. Bank Distress (with OLS fit line)")
+table1 <- stargazer(fixed_iv_model_no_FixedEffects, fixed_iv_model_JustYearCounty,
+                    fixed_iv_model_labor,title="Fixed Effects", align=TRUE)
+table2 <- stargazer(SLS1_labor_robust, SLS2_labor_robust, title="Instrumental Variables", align=TRUE)
+table3 <- stargazer(fixed_iv_model_labor_dependence, title="Dependence on External Finance", align=TRUE)
+#table3 <- stargazer(fixed_iv_model_y_noFixedEffects, fixed_iv_model_y_YearCounty,
+                    #fixed_iv_model_y,title="Fixed Effects -- Total Value Added", align=TRUE)
+
+############## fun with graphs ########################
+install.packages("mapproj")
+install.packages("ggmap")
+install.packages("DeducerSpatial")
+
+#make sure the packages are running
+require(maps)
+require(ggmap)
+par(mfrow = c(2, 1))
+#map("usa")
+data(county.fips)
+# Plot unemployment by country
+#colors = c("#F1EEF6", "#D4B9DA", "#C994C7", "#DF65B0", "#DD1C77", "#980043")
+colors = c("#C994C7", "#DF65B0", "#DD1C77", "#980043")
 
 
+maps_data <- panel_original[c('fips', 'fixed_char')]
+maps_data$log_bank_distress <- abs(as.numeric(log(maps_data$fixed_char)))
+maps_data$log_bank_distress[!is.na(maps_data$log_bank_distress) & maps_data$log_bank_distress > 0] <- log(maps_data$log_bank_distress[!is.na(maps_data$log_bank_distress) & maps_data$log_bank_distress > 0])
+maps_data[mapply(is.infinite, maps_data)] <- 0
+
+maps_data$colorBuckets <- as.numeric(cut(maps_data$log_bank_distress, breaks = 4))
+colorsmatched <- maps_data$colorBuckets[match(county.fips$fips, maps_data$fips)]
+map("county", col = colors[colorsmatched], fill = TRUE, resolution = 0,  lty = 0, projection = "polyconic")
+map("state", col = "white", fill = FALSE, add = TRUE, lty = 1, lwd = 0.2, projection = "polyconic")
+title("Bank Distress by County, 1929-1935")
+
+leg.txt <- c("1st Quartile", "2nd Quartile", "3rd Quartile", "4th Quartile")
+legend("topright", leg.txt, horiz = TRUE, fill = colors)
