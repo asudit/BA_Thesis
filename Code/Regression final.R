@@ -65,8 +65,8 @@ panel[mapply(is.infinite, panel)] <- NA
 #panel <- panel[is.finite(rowSums(panel)),]
 #panel <- panel[!rowSums(!is.finite(panel)),]
 
-y <- as.numeric(as.character(panel$Value.of.product))
-y[!is.na(y) & y > 0] <- log(y[!is.na(y) & y > 0])
+#y <- as.numeric(as.character(panel$Value.of.product))
+#y[!is.na(y) & y > 0] <- log(y[!is.na(y) & y > 0])
 #varying_iv <- as.numeric(panel$varying_iv)
 
 panel$firm <- as.factor(panel$firm.code)
@@ -260,7 +260,9 @@ table3 <- stargazer(fixed_iv_model_labor_dependence, title="Dependence on Extern
 #table3 <- stargazer(fixed_iv_model_y_noFixedEffects, fixed_iv_model_y_YearCounty,
                     #fixed_iv_model_y,title="Fixed Effects -- Total Value Added", align=TRUE)
 
-############## fun with graphs ########################
+################################################### fun with graphs ##############################################
+
+############### spatial map #################################
 install.packages("mapproj")
 install.packages("ggmap")
 install.packages("DeducerSpatial")
@@ -283,9 +285,66 @@ maps_data[mapply(is.infinite, maps_data)] <- 0
 
 maps_data$colorBuckets <- as.numeric(cut(maps_data$log_bank_distress, breaks = 4))
 colorsmatched <- maps_data$colorBuckets[match(county.fips$fips, maps_data$fips)]
+colorsmatched[is.na(colorsmatched)] <- 1
+
 map("county", col = colors[colorsmatched], fill = TRUE, resolution = 0,  lty = 0, projection = "polyconic")
 map("state", col = "white", fill = FALSE, add = TRUE, lty = 1, lwd = 0.2, projection = "polyconic")
 title("Bank Distress by County, 1929-1935")
 
 leg.txt <- c("1st Quartile", "2nd Quartile", "3rd Quartile", "4th Quartile")
-legend("topright", leg.txt, horiz = TRUE, fill = colors)
+legend("top", leg.txt,horiz = TRUE,fill = colors, cex = 0.45)
+
+
+######################## changes in revenue and labor by industry graphs ################
+CPI <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/CPI Unadjusted,annual,index units.xlsx")
+panel_changes <- sqldf('Select a.*, b.CPI FROM panel_original AS a LEFT JOIN CPI AS b ON (a.Year = b.Year)')
+panel_changes <- subset(panel_changes, panel_changes$open_29 == 1 & panel_changes$open_33 ==1 & Year!=1935)
+
+panel_changes$CPI <- as.numeric(panel_changes$CPI)
+y <- as.numeric(as.character(panel_changes$Value.of.product))
+#y[!is.na(y) & y > 0] <- log(y[!is.na(y) & y > 0])
+panel_changes$y <- y/panel_changes$CPI
+panel_changes$y <- panel_changes$y * 1/1000
+#panel_original_revenue[mapply(is.infinite, panel_original_revenue)] <- NA
+#panel_changes[is.na(panel_changes)] <- 0
+#panel_original_revenue$dependence_dummy <- ifelse((panel_original_revenue$ext_finance > 0.04), 1, ifelse(panel_original_revenue$ext_finance <= 0.04 , 0, 0))
+panel_changes$labor <- (as.numeric(panel_changes[,'Wage.earners.by.month,.January']) + as.numeric(panel_changes[,'Wage.earners.by.month,.February']) +
+                  as.numeric(panel_changes[,'Wage.earners.by.month,.March']) + as.numeric(panel_changes[,'Wage.earners.by.month,.April'])+ 
+                  as.numeric(panel_changes[,'Wage.earners.by.month,.May']) + as.numeric(panel_changes[,'Wage.earners.by.month,.June']) + 
+                  as.numeric(panel_changes[,'Wage.earners.by.month,.July']) + as.numeric(panel_changes[,'Wage.earners.by.month,.August']) + 
+                  as.numeric(panel_changes[,'Wage.earners.by.month,.September']) + as.numeric(panel_changes[,'Wage.earners.by.month,.October']) 
+                + as.numeric(panel_changes[,'Wage.earners.by.month,.November']) + as.numeric(panel_changes[,'Wage.earners.by.month,.December']))
+panel_changes$labor <- panel_changes$labor * 1/1000
+
+#rev_data <- data.frame(ddply(panel_original_revenue, .(Industry, Year,ext_finance), summarize,  Average_rev=mean(y)))
+#rev_data$dependence_dummy <- as.integer(rev_data$dependence_dummy)
+#rev_data$Industry <- as.factor(rev_data$Industry)
+#rev_data$Year <- as.integer(rev_data$Year)
+
+#ggplot(data =subset(rev_data, ext_finance < -0.10 & ext_finance >= -0.12), aes(x=Year, y=Average_rev, group=Industry, shape=Industry, color=Industry)) +geom_line() +  geom_point()+ xlab("Year") + ylab("Revenue, Adjusted for Inflation (hundred thousands)") + ggtitle("Average Firm Revenue by Industry, 1929-1935")
+#ggplot(data =subset(rev_data, ext_finance == -0.10), aes(x=Year, y=Average_rev, group=Industry, shape=Industry, color=Industry)) +geom_line() +  geom_point()+ xlab("Year") + ylab("Revenue, Adjusted for Inflation (hundred thousands)") + ggtitle("Average Firm Revenue by Industry, 1929-1935")
+#ggplot(data =subset(rev_data, ext_finance <= 0.14 & ext_finance > -0.10), aes(x=Year, y=Average_rev, group=Industry, shape=Industry, color=Industry)) +geom_line() +  geom_point()+ xlab("Year") + ylab("Revenue, Adjusted for Inflation (hundred thousands)") + ggtitle("Average Firm Revenue by Industry, 1929-1935")
+#ggplot(data =subset(rev_data, ext_finance <=0.39 & ext_finance > 0.14), aes(x=Year, y=Average_rev, group=Industry, shape=Industry, color=Industry)) +geom_line() +  geom_point()+ xlab("Year") + ylab("Revenue, Adjusted for Inflation (hundred thousands)") + ggtitle("Average Firm Revenue by Industry, 1929-1935")
+
+#ggplot(data =subset(rev_data, ext_finance< 0.4), aes(x=Industry, y=Average_rev, fill=Industry)) + xlab("Industry") + ylab("Revenue, Adjusted for Inflation (hundred thousands)") + ggtitle("Average Firm Revenue by Industry, 1929-1935") +geom_bar(stat="identity", position=position_dodge())
+panel_changes<-panel_changes[order(panel_changes$firm.code,panel_changes$Year),]
+panel_changes$y_diff <-panel_changes$y -  lag(lag(panel_changes$y))
+panel_changes$l_diff <- panel_changes$labor - lag(lag(panel_changes$labor))
+
+
+#View(Panel_diff)
+
+for (i in 3:nrow(panel_changes)){
+  if (panel_changes$firm.code[i]!=panel_changes$firm.code[i-2]) {
+    panel_changes$y_diff[i] <- NA 
+    panel_changes$l_diff[i] <- NA 
+  }
+}
+panel_changes[is.na(panel_changes)] <- 0
+rev_change_data <- data.frame(ddply(panel_changes, .(Industry), summarize,  Average_change=mean(y_diff)))
+ggplot(data =rev_change_data, aes(x=Industry, y=Average_change, fill=Industry)) + xlab("Industry") + ylab("Average Change in Revenue, 1933-1929, Adjusted for Inflation (in thousands)") + ggtitle("Average Change in Revenue by Industry, 1933-1929") +geom_bar(stat="identity", position=position_dodge(0.9)) + geom_text(aes(label=Industry), size = 3,angle = 90) + theme(axis.text.x=element_blank())
+                                                                                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                                                                              
+
+labor_change_data <- data.frame(ddply(panel_changes, .(Industry), summarize,  Average_change=mean(l_diff)))
+ggplot(data =labor_change_data, aes(x=Industry, y=Average_change, fill=Industry)) + xlab("Industry") + ylab("Average Change in Wage Earners Hired, 1933-1929 (in thousands)") + ggtitle("Average Change in Employment by Industry, 1933-1929") +geom_bar(stat="identity", position=position_dodge(0.9)) + geom_text(aes(label=Industry), size = 3,angle = 90) + theme(axis.text.x=element_blank())
