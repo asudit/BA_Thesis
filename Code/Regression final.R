@@ -348,3 +348,36 @@ ggplot(data =rev_change_data, aes(x=Industry, y=Average_change, fill=Industry)) 
 
 labor_change_data <- data.frame(ddply(panel_changes, .(Industry), summarize,  Average_change=mean(l_diff)))
 ggplot(data =labor_change_data, aes(x=Industry, y=Average_change, fill=Industry)) + xlab("Industry") + ylab("Average Change in Wage Earners Hired, 1933-1929 (in thousands)") + ggtitle("Average Change in Employment by Industry, 1933-1929") +geom_bar(stat="identity", position=position_dodge(0.9)) + geom_text(aes(label=Industry), size = 3,angle = 90) + theme(axis.text.x=element_blank())
+
+################## firm exit graph #########
+panel_exit <- panel_original
+est_change_data <- data.frame(ddply(subset(panel_exit, open_29 ==1),~Year,summarise,est_count=length(unique(firm.code))))
+entry_29 <- length(unique(subset(panel_exit, panel_exit$open_29 ==1)$firm.code))
+entry_31 <- length(unique(subset(panel_exit, panel_exit$open_29 ==0 & panel_exit$open_31 ==1 )$firm.code))
+entry_33 <- length(unique(subset(panel_exit, panel_exit$open_29 ==0 & panel_exit$open_31 ==0 &panel_exit$open_33 ==1)$firm.code))
+entry_35 <- length(unique(subset(panel_exit, panel_exit$open_29 ==0 & panel_exit$open_31 ==0 &panel_exit$open_33 ==0 & panel_exit$open_35 ==1)$firm.code))
+entry <- c(entry_29, entry_31, entry_33, entry_35)
+year_entry <- c(1929, 1931, 1933, 1935)
+entry_data <- data.frame(entry, year_entry)
+
+ggplot(data =est_change_data, aes(x=Year, y=est_count)) +geom_line() +  geom_point()+ xlab("Year") + ylab("Number of Establishments") + ggtitle("Number of Firms Per Year, 1929-1935") 
+
+################### Coefficient by industry #####################
+library(sandwich)
+library(lmtest)
+library(multiwayvcov)
+d <- data.frame(matrix(NA, nrow = 22, ncol = 3))
+for(i in 1:length(levels(panel$industry)))
+  {
+  new_industry <- levels(panel$industry)[i]
+  fixed_iv_model_labor <- lm(labor ~ post*fixed_char  + year + county, data = subset(panel, panel$industry == new_industry))
+  fixed_iv_model_labor <- coeftest(fixed_iv_model_labor, vcov=vcovHC(fixed_iv_model_labor,type="HC0",cluster="County"))
+  #coeff<- tail(fixed_iv_model_labor[,1],1)
+  #print(c(levels(panel$industry)[i], coeff))
+  coeff<- fixed_iv_model_labor[3,1]
+  d[i,] <- c(levels(panel$industry)[i], as.numeric(as.character(coeff)), head(panel$ext_finance[panel$industry == new_industry]))
+
+}
+d$coeff <- as.numeric(d$X2)
+ggplot(data =d, aes(x=X3, y=coeff, group=1)) +  geom_point()+ geom_smooth(method='lm')+ xlab("External Financial Dependence") + ylab("Bank Distress Coefficient") + ggtitle("Effects of Bank Distress on Employment, by Industry") 
+

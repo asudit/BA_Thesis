@@ -1,0 +1,223 @@
+
+\documentclass[letter,11pt]{article}
+%\selectlanguage{english}
+
+\AtBeginDocument{\setstretch{1.5}}
+
+%%% PACKAGES %%%
+\usepackage[english]{babel} % hyphenation
+\usepackage[margin=2cm]{geometry} % margins
+\usepackage{graphicx} % support for graphics
+\usepackage{amsmath} % support for math­e­mat­i­cal typesetting
+\usepackage{amssymb} % math­e­mat­i­cal symbols
+\usepackage{color} % support for colors
+\usepackage{mathtools} % more math­e­mat­i­cal type­set­ting
+\usepackage{amsthm} % for defining theorem-like environments
+\usepackage{enumerate} % change appearance of numbered lists
+\usepackage{framed} % textboxes
+\usepackage[format=plain,labelfont=bf,up]{caption} % cus­tomise cap­tions for fig­ures and ta­bles
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue,linktoc=all, citecolor=black]{hyperref} % hyperlinks
+\usepackage[usenames,dvipsnames]{xcolor} % more colors
+\usepackage{setspace} % set­ting the spac­ing be­tween lines
+\usepackage{titlesec} % sec­tion­ing com­mands
+\usepackage{subfigure} % multiple figures arranged neatly
+\usepackage{natbib} % references
+\usepackage{pdfpages} % import pages from other pdf fiels
+\usepackage{comment} % comment out large sections
+\usepackage{cancel} % strikethrough math
+\usepackage{verbatim} % for including code
+\usepackage{titlesec} % change font size of section
+\usepackage{dcolumn}
+\usepackage{pdfpages}
+\usepackage{listings}
+\usepackage[autostyle, english = american]{csquotes}
+\usepackage{threeparttable}
+
+
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+%%% CUSTOM COMMANDS %%%
+\def\ci{\perp\!\!\!\perp} % statistical independence symbol
+\def\nci{\perp\!\!\!\!\!\!\diagup\!\!\!\!\!\!\perp}
+\newcommand{\ind}{1\hspace{-2.1mm}{1}} % indicator function
+\newcommand{\rl}{\mathbb{R}} % real numbers
+\newcommand{\ex}[1]{\mathbb{E} \left[ #1 \right]} % expectation operator
+\newcommand{\pr}[1]{\mathbb{P} \left( #1 \right)} % probability
+\newcommand{\var}[1]{\mathbb{V}\text{ar} \left[ #1 \right]} % variance
+\newcommand{\cov}[1]{\mathbb{C}{ov} \left[ #1 \right]} % covariance
+\newcommand{\corr}[1]{\mathbb{C}{orr} \left[ #1 \right]} % correlation
+\newcommand{\tab}{\hspace{.4cm}}
+\newcommand{\lra}{\text{ }\Leftrightarrow\text{ }}
+\newcommand{\ra}{\text{ }\Rightarrow\text{ }}
+\newcommand{\la}{\text{ }\Leftarrow\text{ }}
+\newcommand{\veps}{\varepsilon}
+\newcommand{\spc}{\text{ }}
+
+
+%%% SET FONT %%%
+\renewcommand{\familydefault}{\sfdefault}
+\linespread{1.2}
+\setlength{\parindent}{0pt}
+\usepackage{sfmath}
+\titleformat*{\section}{\normalsize\bfseries}
+\titleformat*{\subsection}{\normalsize\bfseries}
+\titleformat*{\subsubsection}{\normalsize\bfseries}
+\titleformat*{\paragraph}{\normalsize\bfseries}
+\titleformat*{\subparagraph}{\normalsize\bfseries}
+
+%%% SET INDENT %%%
+\setlength\parindent{24pt}
+
+
+\begin{document}
+{\fontfamily{cmr}\selectfont
+
+
+\title{\vskip-1cm \small The University of Chicago /  Spring 2017\footnote{This document was updated on \today.} \\
+\Large Spring Quarter Draft \vskip-.2cm}
+\author{\normalsize Adam Sudit}
+\date{April 2017}
+\maketitle
+
+\section{Introduction}
+I study the effects of bank distress on manufacturing firms' output during the Great Depression, within the cotton goods industry. Using different models, I find that bank distress does indeed have a negative effect on firm output, as well as the probability they'll stay open after the crisis. The standard errors of the fixed effects models are realtively high, and not statistically significant, which motivates my direction for further work. On the other hand, the coefficient on the variable of interest of the probit model is large in magnitude, statistically significant, and negative, which could indicate that bank distress could make firms more likely to close down in the wake of economic crisis. 
+
+\section{Statement of the Research Question}
+During times of financial panic, what is the effect of bank distress on manufacturing output, and the likelihood a manufacturing firm will stay open after the end of the financial panic? More specifically, during the Great Depression, what was the effect of bank distress on plant-level output in the cotton goods industry, and the probability those plants were open after the Great Depression?
+\section{Literature Review}
+
+\indent Conventional wisdom has been that monetary channels are the main way in which a financial crisis affects real economic activity. In particular, many thought that bank distress depresses the economy by decreasing the supply of money (Friedman and Schwartz 1963). Even so, this theory cannot fully explain the prodigious decline in output during the Great Depression, among other flaws. Bernanke (1983) redefined the economic literature by showing that while monetary channels are important to establishing a causal connection between bank distress and economic activity, non-monetary channels have a significant role to play as well. His key idea is that of the cost of intermediation in incomplete markets; as the transaction costs inherent to an incomplete market like bank lending increase in the wake of financial panic, the acquisition of credit become prohibitively expensive. As Bernanke then points out (pg.21), aggeregate demand of the household must then decrease, in turn causing aggregate output to plummet. Bernanke asserts that this theory better explains the severity of the Great Depression. Even so, one important flaw in his theory is that it does not disaggregate supply effects from demand effects within the lending channel, the mechanism through which credit is passed from a lender to a borrower. Indeed, a bank may choose to not extend credit during a financial crisis not because of weakening financial health on the part of the bank, but because ailing borrowers make for a poor return on investment. This reverse casuality could cause Bernanke's results to be overstated. Calomiris and Mason (2003) attempt to circumvent this issue by instrumenting for loan supply and exploiting cross-state variation in state-level influences on lending channels to robustly identify the casual link between bank distress and growth in state-level income. 
+\\
+\indent The analysis of the effects of bank distress on real economic activity has not been restricted to the Great Depression. One group of papers in the literature use natural experiments to identify exogenous shocks to lending channels. Peek and Rosengren (2000), for example, measure the effect of a shock within the Japanese banking sector on commercial real estate markets within the United States. Similarly, Ashcraft (2005) measure the effect of small bank closures on local economic outcomes in Texas, by using the fact that each local bank suspension was independent of the health of the local economy, and instead tied to FDIC measures on a state level. In both cases though, the studies were restricted to the effect of lending shocks to local markets or economies.
+\\
+\indent A more recent body of literature has exploited the availability of firm-level data to account for various unobservable influences within the lending channel. Khwaja and Mian (2008) employ a new empirical strategy in which changes in loan allocation to a specific borrowing firm are compared across banks affected to varying degrees by liquidity shocks, in order to isolate supply effects from demand effects within each firm. They find that a firm's ability to obtain loans from alternative sources in the wake of a liquidity shock affects the extent to which a firm subsequently declines; indeed, for this reason smaller firms are worse off than larger firms when a liquidity shock occurs. Chodorow-Reich (2014) finds that the ability of a firm to obtain credit in the wake of the collapse of Lehman Brothers directly influenced uemployment outcomes within those firms. Firms that had access to credit from healthier lenders before the collapse did not lay off as many employees, relative to firms with access to credit from less financially stable lenders. Greenstone et. al (2015) do not find a statistically significant negative effect of shocks to small business loans on the economy. 
+\\
+\indent One of the salient themes within the literature is the notion that smaller firms should be more adversely affected by shocks to the financial sector than larger firms. Bernanke (1983) captures this intuition with his concept of the cost of credit intermediation, as mentioned previously. Bernanke, Gertler, and Gilchrist (1994) further develop the theory with the idea of a financial accelerator, in which relatively small shocks to the economy can be exacerbated by the market for credit. They show that when borrowers cannot obtain credit outside of the firm (external financing) in the wake of one of these shocks, they experience decreases in output. This scenario tends to befall smaller firms, since as Chodorow-Reich (2014) observes, smaller firms tend to have less capital on hand to maintain daily operations in the absence of lending channels. Further, lending to smaller firms with less of a credit history than larger firms poses an asymmetric problem that requires costly monitoring regimes. The potential costs of lending to smaller firms is only made worse during an economic crisis, in which the probability of those very firms defaulting increases as their balance sheet health deteriorates, causing lenders to flock to safer investments and making borrowing more expensive (again, see Bernanke et. al's (1994), especially the concept of ``flight to quality" ).
+\\
+\indent This paper seeks to contribute to the literature by extending Calomiris and Mason's inuition to plant-level data from the Census of Manufacturers, from 1929-1936. My identification strategy relies on cross-county heterogeienity in bank health and solvency outcomes, along with the insight that the demand for credit by county-level manufacturing plants most likely did not have an economically significant effect on bank health on the county, state, and national level. Previous papers that use firm or plant-level data to this effect during the Great Depression include Ziebarth (2013), Lee and Mezzanotti (2014), and Nanda et. al (2014). 
+
+\section{Tables}
+\captionsetup{width=12.5cm}
+
+  % Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu"
+  % Date and time: Fri, Apr 14, 2017 - 22:26:36                                                            
+  % Requires LaTeX packages: dcolumn                                                                   
+ \begin{table} [!htbp] \centering                                                                    
+ \caption{Fixed Effects}                                                                           
+ \label{}                                                                                       
+ \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }                        
+ \\[-1.8ex]\hline                                                                                     
+ \hline \\[-1.8ex] 
+ \\[-1.8ex] & \multicolumn{3}{c}{ } \\                                                         
+ \\[-1.8ex] log(Labor) & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\    
+ \hline \\[-1.8ex]                                          
+ Post\_1929 x Bank Distress & -0.181^{***} & -0.143^{**} & -0.003 \\ 
+  & (0.050) & (0.061) & (0.050) \\ 
+\hline \\[-1.8ex]
+Year Fixed Effects &  & \multicolumn{1}{c}{X} & \multicolumn{1}{c}{X} \\ 
+County Fixed Effects &  & \multicolumn{1}{c}{X} & \multicolumn{1}{c}{X} \\ 
+Industry Fixed Effects &  &  & \multicolumn{1}{c}{X} \\
+Observations & \multicolumn{1}{c}{34,207} &   \multicolumn{1}{c}{34,207} & \multicolumn{1}{c}{34,207} \\
+R-squared  &   \multicolumn{1}{c}{0.003975} & \multicolumn{1}{c}{0.2561} & \multicolumn{1}{c}{0.6921} \\
+\hline 
+\hline \\[-1.8ex] 
+\textit{Notes:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01}
+\end{tabular}
+\caption*{Table 1 reports the OLS coefficient regression results of log labor every other year from 1929 to 1935 on bank distress, 
+a fixed county characteristic calclulated by dividing the sum of all bank suspensions from 1930 to 1935 in a given county 
+by the total number of banks that were open in that county during 1929. Robust standard errors are clustered at the county level.}
+\end{table} 
+
+
+
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Sat, Apr 15, 2017 - 00:13:49                                                       
+% Requires LaTeX packages: dcolumn
+\captionsetup{width=10cm}                                                                  
+\begin{table}[!htbp] \centering                                                                       
+\caption{Instrumental Variable}                                                                    
+\label{}                                                                                          
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} }                                      
+\\[-1.8ex]\hline
+\hline \\[-1.8ex] 
+\\[-1.8ex]  & \multicolumn{1}{c}{First Stage} & \multicolumn{1}{c}{Second Stage}\\                                     
+\hline \\[-1.8ex]                                                                                   
+Change in Mortgage  & -0.020^{**} &  -2.536^{**}\\                                                                          
+Debt Per Acre, 1920-1910 & (0.008) &  (1.272) \\ 
+\hline \\[-1.8ex]
+Year Fixed Effects & \multicolumn{1}{c}{X} & \multicolumn{1}{c}{X} \\ 
+County Fixed Effects  & \multicolumn{1}{c}{X} & \multicolumn{1}{c}{X} \\ 
+Industry Fixed Effects &  \multicolumn{1}{c}{X} & \multicolumn{1}{c}{X} \\
+Observations &  \multicolumn{1}{c}{14,311} &  \multicolumn{1}{c}{14,311} \\
+R-squared  &   \multicolumn{1}{c}{0.6141} & \multicolumn{1}{c}{0.7812} \\                                                                                                                     
+\hline 
+\hline \\[-1.8ex] 
+\textit{Notes:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\caption*{Column (1) reports the first stage regression results of instrumenting the bank distress fixed county characteristic with change in mortgage debt per acre, from 1920-1910 in a given county. Column (2) reports the regression results of log labor every other year from 1929 to 1935 on instrumented bank distress. Robust standard errors are clustered at the county level. Mortgage debt data from Rajan and Ramcharan (2015).}
+\end{table} 
+                                                                                                       
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu"
+% Date and time: Sat, Apr 15, 2017 - 12:24:07"                                                            
+% Requires LaTeX packages: dcolumn " 
+\captionsetup{width=16.5cm}                                                                     
+\begin{table}[!htbp] \centering                                                                       
+\caption{Dependence on External Finance}                                                          
+\label{}                                                                                         
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+ \\[-1.8ex]\hline  
+ \hline \\[-1.8ex] 
+ \\[-1.8ex] log(Labor) & \multicolumn{1}{c}{(1)} \\
+ \hline \\[-1.8ex]                                                                             
+ High Dependence on External Finance x Bank Distress & -0.276^{***} \\ 
+           & (0.091) \\ 
+  & \\ 
+ Post\_1929 x Bank Distress & -0.038 \\ 
+  & (0.058) \\ 
+  & \\ 
+ High Dependence on External Finance x Post\_1929 x Bank Distress & 0.070 \\ 
+  & (0.108) \\ 
+\hline \\[-1.8ex] 
+Year Fixed Effects & \multicolumn{1}{c}{X} \\ 
+County Fixed Effects  & \multicolumn{1}{c}{X} \\ 
+Industry Fixed Effects &  \multicolumn{1}{c}{X} \\
+Observations & \multicolumn{1}{c}{34,207}  \\
+R-squared  &   \multicolumn{1}{c}{0.6923}  \\
+\hline 
+\hline \\[-1.8ex] 
+\textit{Notes:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\caption*{Table 3 reports fixed effects regression coefficients of log labor for every other year from 1929 to 1935, on the interaction of a high external financial dependence dummy variable with the previous measure of bank distress in tabe 1. Firms in industries with levels of external financial dependence above the industry sample median of 0.04 are categorized as highly dependent on external financing. See table 4 for levels of external financial dependence by industry within the sample. Robust standard errors are clustered at the county level.}
+\end{table} 
+
+\section{Figures}
+
+
+}
+
+\end{document}
+
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu"
+% Date and time: Sat, Apr 15, 2017 - 11:01:35                                                    
+% Requires LaTeX packages: dcolumn                                                                  
+%\begin{table}[!htbp] \centering                                                                      
+%\caption{Fixed Effects -- Revenue}                                                        
+%\label{}                                                                                         
+%\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }                        
+% \\[-1.8ex]\hline                                                                                     
+% \hline \\[-1.8ex] 
+% \\[-1.8ex] & \multicolumn{3}{c}{ } \\                                                         
+% \\[-1.8ex] log(Total Value Added) & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\    
+% \hline \\[-1.8ex]                                          
+%Post\_1929 x Bank Distress & -0.228^{***} & -0.124^{**} & -0.022 \\ 
+%  & (0.050) & (0.055) & (0.052) \\ 
+%  & & & \\ 
+%\hline \\[-1.8ex]
+%Observations & 34,207 &   34,207 & 34,207 \\
+%R-squared  &  0.1163  & 0.2504 &  0.3943\\ 
+%\hline 
+%\hline \\[-1.8ex] 
+%\textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+%\end{tabular} 
+%\end{table} 
