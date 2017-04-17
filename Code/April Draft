@@ -61,7 +61,7 @@
 \renewcommand{\familydefault}{\sfdefault}
 \linespread{1.2}
 \setlength{\parindent}{0pt}
-\usepackage{sfmath}
+%\usepackage{sfmath}
 \titleformat*{\section}{\normalsize\bfseries}
 \titleformat*{\subsection}{\normalsize\bfseries}
 \titleformat*{\subsubsection}{\normalsize\bfseries}
@@ -76,7 +76,8 @@
 {\fontfamily{cmr}\selectfont
 
 
-\title{\vskip-1cm \small Spring Quarter Draft /  April 2017 / Adam Sudit}
+\title{\vskip-1cm \small Spring Quarter Draft /  April 2017 / Adam Sudit \\
+\Large Bank Distress and Unemployment During the Great Depression:\\ A Plant-Level Approach \vskip-.2cm}
 \date{}
 \maketitle
 
@@ -109,12 +110,112 @@ Leading up to the Great Depression, the U.S. Banking System was highly fragmente
 \\
 \indent In an effort to force these independent state banks to enter the national banking system, a 10 percent tax was issued on all state bank notes in 1865. As a result the number of state banks, where state banks included all banks chartered by state law, declined to 247 by 1868. The period between the end of the Civil War and 1913 saw a resurgence in state banking and the dual banking system between local and national banks. State banks became depository institutions instead of issuing bank notes, and able to compete with national banks due to less stringent state banking laws, among other factors. For example, in many states, state banks faced substantially lower capital requirements than national banks  \href{https://fraser.stlouisfed.org/files/docs/historical/federal\%20reserve\%20history/frcom_br_gp_ch_banking/dual_banking_system_us.pdf}{(Federal Reserve, 1932)}.
 \\
-\indent Importantly, the new banking system created after the Civil War was almost completely made up of unit banks. The Currency Act of 1900 saw a marked increase in unit banks. As the number of unit banks continued to grow from 1900 to the 19020's, state branch banking occurred more often as well. Unit banks strongly opposed branch banks, due to the compeition they posed, and as result successfully lobbied for the ban of branch banking on the state and national level during the 1920's. The 1924 Supreme Court case \textit{First National in St. Louis v. State of Missouri} confirmed that national bank branching was illegal. \href{https://www.richmondfed.org/~/media/richmondfedorg/publications/research/economic_review/1990/pdf/er760601.pdf}{(Mengle, 1990)}.
+\indent Importantly, the new banking system created after the Civil War was almost completely made up of unit banks. The Currency Act of 1900 saw a marked increase in unit banks. As the number of unit banks continued to grow from 1900 to the 19020's, state branch banking occurred more often as well. Unit banks strongly opposed branch banks, due to the compeition they posed, and as result successfully lobbied for the ban of branch banking on the state and national level during the 1920's. The 1924 Supreme Court case \textit{First National in St. Louis v. State of Missouri} confirmed that national bank branching was illegal. \href{https://www.richmondfed.org/~/media/richmondfedorg/publications/research/economic_review/1990/pdf/er760601.pdf}{(Mengle, 1990)}. Even after national banks were allowed to create branches in the localities near their headquarters following the passage of The McFadden Act of 1927 (if branching was already legal in the given state), national bank branching within a single state remained significantly limited \href{https://www.jstor.org/stable/pdf/3875046.pdf}{(Mitchener, 2005)}.
 \\
-\indent This discussion of the history of U.S. Banking is intended to substantiate two key facts about U.S. Banking in the years leading to the Great Depression. First of all, the banking system was highly fragmented and there were numerous banks on the state and local level under state law that competed with national banks. Therefore, the financing these banks provided to firms was most likely not negligible. Second, the abolition or restriction of bank branching across and within states meant that bank distress varied across geography, and bank-specific sources of distress were often isolated to the regional level. These facts will inform my identification strategy. Table 1 reports state branching laws for 1910 and 1929.
+\indent This discussion of the history of U.S. Banking is intended to substantiate two key facts about U.S. banking in the years leading to the Great Depression. First of all, the banking system was highly fragmented and there were numerous banks on the state and local level under state law that competed with national banks. Therefore, the financing these banks provided to firms was most likely not negligible. Second, the abolition or restriction of bank branching across and within states meant that many banks were composed of a single office in a given county, and that bank-specific sources of distress were often isolated to the regional level. These facts will inform my identification strategy. Table 1 reports state branching laws for 1910 and 1929.
+
+\section{Data and Summary Statistics}
+
+\indent Firm-level measures of labor, revenue, and industry are from the U.S. Census of Manufacturers, for 1929, 1931, 1933, and 1935 \footnote{Nicolas Ziebarth and Chris Vickers generously shared these data with me}. Table 1 includes summary statistics for the census sample. Revenue is reported as total value added, which I adjust for inflation using the consumer price index. The labor measure is reported as the number of wage earners per month, which I then aggregate to create an annualized labor measure.
 \\
+\indent Data on bank suspensions, total number of banks, and deposits on the county level comes from the FDIC Data on Banks in the United States, available on the ICSPR. Tables 2 and 3 report number of bank suspensions and number of banks suspended as a percentage of total banks, respectively. In general, we see that bank suspensions rose sharply between 1929 and 1930, receeded in 1931, and then rose even further in 1932. As the tables also show, there was also significant variation by region of the United States.
+\\
+\indent Ideally, I would use county level loan data between specific banks and firms to identify the credit channel between banks and firms. Unfortunately, as far I know these data does not exist. \href{https://www0.gsb.columbia.edu/faculty/ccalomiris/papers/Consequences%20of%20U.S.%20Bank%20Distress%20During%20the%20Depression.pdf}{Calomiris and Mason} use county-level loan supply instruments including size of bank assets, the ratio of net worth to bank assets, and real estate owned to circumvent this dearth of data. In a working paper, \href{http://www.nber.org/papers/w23216.pdf}{Benmelech et. al} use variation in the maturity dates of corporate bonds that firms held during the Great Depression as a proxy for credit supply. \href{http://pubs.aeaweb.org/doi/pdfplus/10.1257/mac.5.1.81}{Ziebarth} instead uses variation in Federal policy across different districts of Mississippi to study the effect of bank distress on firm revenue. Based on previous work in the literature\footnote{See \href{http://www.people.hbs.edu/tnicholas/bank_distress.pdf}{Nanda and Nicolas, 2014} and \href{http://scholar.harvard.edu/files/jglee/files/lee_mezzanotti_bank_distress_manufacturing_0.pdf}{Lee and Mezzanotti, 2014}.}, I construct the following county-level measure of bank distress:
+\begin{align*}
+BankDistress_c = \frac{\sum_{t=1930}^{1935} BankSuspensions_{c, t}} {Banks_{c, 1929}}\
+\end{align*}
+\indent In other words, this measure of bank distress is a fixed county characteristic, in which I normalize the sum of the number of banks suspended from 1930-1935 in a given county by the number of banks in the same county during 1929. I include bank suspensions in 1934 and 1935 to account for any residual effects on bank health from the height of the Great Depression, and to ensure the measure spans the entirety of the census data. The vast majority of bank suspensions occurred between 1930-1933, so including 1934 and 1935 would not lead to overstated results in any case. Figure 1 maps this measure of bank distress to all counties in the sample. The map illustrates the considerable geographic variation in the level of bank distress. The FDIC data is quite useful in painting a complete picture of bank distress across the United States because it has data on all banks, regardless of whether they were part of the Federal Reserve System or not. Conistent with the literature, I do not discriminate between bank suspensions and bank failures.
+
+\section{Methodology}
+\subsection{Fixed Effects}
+I start with a fixed effects specification in order to control for county, industry, and time-specific shocks to manufacturing activity: 
+\begin{align*}
+log(L_{jt}) = \beta_{0t} + \beta_{1t} Post\_1929XBank\_Distress_c + \gamma_t + \mu_c +\eta_i  + \epsilon_{ct}
+\end{align*}
+\indent where $log(L_{jt})$ is log labor in period t for firm j, $Post\_1929$ is a indicator variable for whether the observation is after 1929,  and $\gamma_t$, $\mu_c$, and $\eta_i$ are year, county, and industry fixed effects, respectively. The indicator variable allows me to ``treat" the firms within my sample with shocks to local financing at the onset of the first Freidman-Schwartz banking crisis in October 1930. The effect of interest is therefore the interaction effects between $Post\_1929$ and the measure of bank distress. Because I am studying the effects of bank distress on firm employment decisions over time, I restrict my sample (as I will do for the rest of the paper) to firms that were open in 1929. Standard errors are clustered by county using heteroscedasticity-consistent standard errors. 
+\\
+\indent Implicit in this empirical specification is the assumption that bank distress is contained to the county level. My discussion of the U.S. banking system provides evidence for this assumption. Restrictions on statewide branching, a national prohibition of interstate branching, and preponderence of small, unit banks meant that many banks were restricted to local operations. As a result of this considerable fragmentation, local, bank-specific shocks most likely did not spill over into other localities. 
+
+\subsection{Instrumental Variables}
+\indent A serious concern with the empirical specification in the previous section is one of reverse casuality. It is likely that banks were more likely to fail or suspend operations in counties with great disruptions in manufacturing activity. Among other things, distressed manufacturing firms were more likely to default on bank loans, causing bank balance sheet health to deteriorate. Since my identification strategy exploits geogrpahic variation in bank distress to identify the credit channel, indeed of explicitly identifying a firm's dependence on external finance, the directionality of bank distress to firm distress may be in question.
+\\
+\indent The economic history literature has dealt with this issue in a variety ways; one common method is to create an instrumental variable based on the proportion of a bank's assets tied to real estate. \href{https://www0.gsb.columbia.edu/faculty/ccalomiris/papers/Consequences%20of%20U.S.%20Bank%20Distress%20During%20the%20Depression.pdf}{Calomiris and Mason} show that the proportion of a bank's assets in real estate is a robust loan-supply instrument. \href{http://eh.net/eha/wp-content/uploads/2013/11/Mladjan.pdf}{Mladjan} uses changes in the value of farmland over the 1910's as an instrument for bank failures.
+\\
+\indent I use change in mortgage debt per acre from 1910 to 1920 (on the county level) as an instrument for bank distress, from \href{http://pubs.aeaweb.org/doi/pdfplus/10.1257/aer.20120525}{Rajan and Ramcharan, 2015}. During the 1910's, the United States enjoyed a surge in land prices due increased agricultural exports to Europe after the decimation of World War I left much of European farmland in ruin. This real estate bubble burst in 1920, causing national farm income to plummet\footnote{See Rajan and Ramcharan, 2015 for a more in-depth discussion of the historical background.}. As Rajan and Ramcharan show, change in mortgage debt per acre from 1920-1910 is a good predictor of bank suspensions between 1920-1929. Taking that logic one step further, banks in counties with increased mortgage debt per acre most likely had weaker balance sheets leading up to the Great Depression, since farmers experiencing a drop in income after 1920 found it difficult to pay back their mortgages. I employ a two stage least squares regression to instrument bank distress with change in mortgage debt. Below is the first stage:
+\begin{align*}
+Post\_1929XBank\_Distress_c = \beta_{0t} + \beta_{1t} \Delta Mortgage\_Debt + \gamma_t + \mu_c +\eta_i  + \epsilon_{ct}
+\end{align*}
+It should be noted that agricultural debt could be highly correlated with county-level shocks during the Great Depression, since farmers could conceivably be burdened by debt from 20 years before. Most instruments tied to land values have similar issues with the exclusion restriction.
+
+\section{Estimation Results}
+Tables 6 and 7 report estimation results for the fixed effects and instrumental variable specifications, respectively. Turning first to table 6, the negative sign of the interaction effects coefficient confirm that bank distress does indeed have a detrimental effect on employment at the firm level. A particularly interest result is that the statistical significance of bank distress on log labor vanishes when industry fixed effects are included. Furthermore, the R-squared value considerably improves when industry fixed effects are included. This may mean that industry-specific characteristics of a firm play an important role in determining a firm's hiring decisions.  
+\\
+\indent Turning to table 7, the statistically significant coefficient from the first stage regression indicates that change in mortgage debt is a strong instrument for bank distress, as predicted. Column 2 reports a large, statistically significant, and negative effect of instrumented bank distress on log labor. The greater statistical significance of the bank distress instrument may indicate it does not suffer as severely from reverse casuality as the original measure of bank distress in table 6. Overall, table 6 and 7 show that bank distress has a detrimental effect on employment.
 
 \section{Tables}
+
+
+\begin{table}[!htbp] \centering                                                                       
+\caption{Census Data Summary Statistics}                                                          
+\label{}                                                                                         
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+ \\[-1.8ex] Category & \multicolumn{1}{c}{Statistic} \\
+ \hline \\[-1.8ex]                                                                             
+ Observations & \multicolumn{1}{c}{45,213} \\
+ Firms & \multicolumn{1}{c}{21,801} \\
+ Industries & \multicolumn{1}{c}{22} \\
+Years & \multicolumn{1}{c}{1929, 1931, 1933, 1935} \\
+Counties & \multicolumn{1}{c}{2,198}\\
+States & \multicolumn{1}{c}{47} \\
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table}
+
+
+\captionsetup{width=10cm}
+\begin{table}[!htbp] \centering                                                                       
+\caption{Number of Bank Suspensions, 1929-1933}                                                          
+\label{}                                                                                         
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3}  D{.}{.}{-3}   D{.}{.}{-3}  D{.}{.}{-3}  D{.}{.}{-3}  D{.}{.}{-3} } 
+ \\[-1.8ex] Region & \multicolumn{1}{c}{1929} & \multicolumn{1}{c}{1930} & \multicolumn{1}{c}{1931} & \multicolumn{1}{c}{1932} &  \multicolumn{1}{c}{1933}\\
+ \hline \\[-1.8ex] 
+ Central & \multicolumn{1}{c}{554} & \multicolumn{1}{c}{1216} & \multicolumn{1}{c}{910} & \multicolumn{1}{c}{2662} & \multicolumn{1}{c}{40}\\
+ Mountain & \multicolumn{1}{c}{48} & \multicolumn{1}{c}{118} & \multicolumn{1}{c}{188} & \multicolumn{1}{c}{230} & \multicolumn{1}{c}{2}\\
+ Mid-atlantic & \multicolumn{1}{c}{56} & \multicolumn{1}{c}{452} & \multicolumn{1}{c}{118} & \multicolumn{1}{c}{796} & \multicolumn{1}{c}{24}\\
+ New England & \multicolumn{1}{c}{22} & \multicolumn{1}{c}{62} & \multicolumn{1}{c}{18} & \multicolumn{1}{c}{152} & \multicolumn{1}{c}{0}\\
+ Northwestern & \multicolumn{1}{c}{828} & \multicolumn{1}{c}{1434} & \multicolumn{1}{c}{894} & \multicolumn{1}{c}{2262} & \multicolumn{1}{c}{26}\\
+ Pacific & \multicolumn{1}{c}{24} & \multicolumn{1}{c}{106} & \multicolumn{1}{c}{174} & \multicolumn{1}{c}{298} & \multicolumn{1}{c}{0}\\
+ South Atlantic & \multicolumn{1}{c}{402} & \multicolumn{1}{c}{384} & \multicolumn{1}{c}{176} & \multicolumn{1}{c}{506} & \multicolumn{1}{c}{10}\\
+ South Central & \multicolumn{1}{c}{702} & \multicolumn{1}{c}{620} & \multicolumn{1}{c}{378} & \multicolumn{1}{c}{884} & \multicolumn{1}{c}{8}\\
+ \hline \\[-1.8ex]                                                                             
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular}
+\caption*{Data from ICSPR FDIC dataset, before merge with Census dataset. Like \href{https://www0.gsb.columbia.edu/mygsb/faculty/research/pubfiles/5629/calomiris_fundamentals_panics.pdf}{(Calomiris and Mason, 2003)}, regions are so defined: Central includes Ohio, Illinois, Indiana, Michigan, and Wisconsin; Mid-atlantic includes New York, New Jersey, and Pennsylvania; Mountain includes Montana, Idaho, Wyoming, Colorado, New Mexico, Arizona, Utah, and Nevada; New England includes Maine, New Hampshire, Vermont, Massachusetts, Rhode Island, and Connecticut; Northwesten includes Minnesota, Iowa, Missouri, North Dakota, South Dakota, Nebraska, and Kansas; Pacific includes Washington, Oregon, and California; South Atlantic includes Maryland, Delaware, District of Columbia, Virginia, West Virginia, North Carolina, South Carolina, Georgia, and Florida; South Central includes Kentucky, Tennessee, Alabama, Mississippi, Arkansas, Oklahoma, Louisiana, and Texas} 
+\end{table} 
+
+\captionsetup{width=10cm}
+\begin{table}[!htbp] \centering                                                                       
+\caption{Number of Bank Suspensions as Percentage of Total Banks, 1929-1933}                                                          
+\label{}                                                                                         
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3}  D{.}{.}{-3}   D{.}{.}{-3}  D{.}{.}{-3}  D{.}{.}{-3}  D{.}{.}{-3} } 
+ \\[-1.8ex] Region & \multicolumn{1}{c}{1929} & \multicolumn{1}{c}{1930} & \multicolumn{1}{c}{1931} & \multicolumn{1}{c}{1932} &  \multicolumn{1}{c}{1933}\\
+ \hline \\[-1.8ex] 
+ Central & \multicolumn{1}{c}{5.02} & \multicolumn{1}{c}{11.8} & \multicolumn{1}{c}{10.4} & \multicolumn{1}{c}{34.1} & \multicolumn{1}{c}{0.69}\\
+ Mountain & \multicolumn{1}{c}{2.85} & \multicolumn{1}{c}{7.38} & \multicolumn{1}{c}{13.2} & \multicolumn{1}{c}{18.8} & \multicolumn{1}{c}{0.21}\\
+ Mid-atlantic & \multicolumn{1}{c}{0.92} & \multicolumn{1}{c}{7.69} & \multicolumn{1}{c}{2.28} & \multicolumn{1}{c}{16.0} & \multicolumn{1}{c}{0.55}\\
+ New England & \multicolumn{1}{c}{1.73} & \multicolumn{1}{c}{5.08} & \multicolumn{1}{c}{1.62} & \multicolumn{1}{c}{14.2} & \multicolumn{1}{c}{0}\\
+ Northwestern & \multicolumn{1}{c}{6.54} & \multicolumn{1}{c}{12.5} & \multicolumn{1}{c}{9.13} & \multicolumn{1}{c}{25.6} & \multicolumn{1}{c}{0.33}\\
+ Pacific & \multicolumn{1}{c}{1.22} & \multicolumn{1}{c}{5.61} & \multicolumn{1}{c}{10.3} & \multicolumn{1}{c}{20.5} & \multicolumn{1}{c}{0}\\
+ South Atlantic & \multicolumn{1}{c}{9.78} & \multicolumn{1}{c}{10.7} & \multicolumn{1}{c}{5.50} & \multicolumn{1}{c}{16.5} & \multicolumn{1}{c}{0.38}\\
+ South Central & \multicolumn{1}{c}{8.06} & \multicolumn{1}{c}{7.94} & \multicolumn{1}{c}{5.34} & \multicolumn{1}{c}{13.4} & \multicolumn{1}{c}{0.14}\\
+ \hline \\[-1.8ex]                                                                             
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular}
+\caption*{See table 2 for details.} 
+\end{table} 
 
 
 \captionsetup{width=6cm}
