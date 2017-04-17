@@ -32,6 +32,8 @@
 \usepackage{listings}
 \usepackage[autostyle, english = american]{csquotes}
 \usepackage{threeparttable}
+\usepackage{hyperref}
+\usepackage{longtable}
 
 
 \usepackage{graphicx}
@@ -74,18 +76,12 @@
 {\fontfamily{cmr}\selectfont
 
 
-\title{\vskip-1cm \small The University of Chicago /  Spring 2017\footnote{This document was updated on \today.} \\
-\Large Spring Quarter Draft \vskip-.2cm}
-\author{\normalsize Adam Sudit}
-\date{April 2017}
+\title{\vskip-1cm \small Spring Quarter Draft /  April 2017 / Adam Sudit}
+\date{}
 \maketitle
 
 \section{Introduction}
 I study the effects of bank distress on manufacturing firms' output during the Great Depression, within the cotton goods industry. Using different models, I find that bank distress does indeed have a negative effect on firm output, as well as the probability they'll stay open after the crisis. The standard errors of the fixed effects models are realtively high, and not statistically significant, which motivates my direction for further work. On the other hand, the coefficient on the variable of interest of the probit model is large in magnitude, statistically significant, and negative, which could indicate that bank distress could make firms more likely to close down in the wake of economic crisis. 
-
-\section{Statement of the Research Question}
-During times of financial panic, what is the effect of bank distress on manufacturing output, and the likelihood a manufacturing firm will stay open after the end of the financial panic? More specifically, during the Great Depression, what was the effect of bank distress on plant-level output in the cotton goods industry, and the probability those plants were open after the Great Depression?
-\section{Literature Review}
 
 \indent Conventional wisdom has been that monetary channels are the main way in which a financial crisis affects real economic activity. In particular, many thought that bank distress depresses the economy by decreasing the supply of money (Friedman and Schwartz 1963). Even so, this theory cannot fully explain the prodigious decline in output during the Great Depression, among other flaws. Bernanke (1983) redefined the economic literature by showing that while monetary channels are important to establishing a causal connection between bank distress and economic activity, non-monetary channels have a significant role to play as well. His key idea is that of the cost of intermediation in incomplete markets; as the transaction costs inherent to an incomplete market like bank lending increase in the wake of financial panic, the acquisition of credit become prohibitively expensive. As Bernanke then points out (pg.21), aggeregate demand of the household must then decrease, in turn causing aggregate output to plummet. Bernanke asserts that this theory better explains the severity of the Great Depression. Even so, one important flaw in his theory is that it does not disaggregate supply effects from demand effects within the lending channel, the mechanism through which credit is passed from a lender to a borrower. Indeed, a bank may choose to not extend credit during a financial crisis not because of weakening financial health on the part of the bank, but because ailing borrowers make for a poor return on investment. This reverse casuality could cause Bernanke's results to be overstated. Calomiris and Mason (2003) attempt to circumvent this issue by instrumenting for loan supply and exploiting cross-state variation in state-level influences on lending channels to robustly identify the casual link between bank distress and growth in state-level income. 
 \\
@@ -97,7 +93,110 @@ During times of financial panic, what is the effect of bank distress on manufact
 \\
 \indent This paper seeks to contribute to the literature by extending Calomiris and Mason's inuition to plant-level data from the Census of Manufacturers, from 1929-1936. My identification strategy relies on cross-county heterogeienity in bank health and solvency outcomes, along with the insight that the demand for credit by county-level manufacturing plants most likely did not have an economically significant effect on bank health on the county, state, and national level. Previous papers that use firm or plant-level data to this effect during the Great Depression include Ziebarth (2013), Lee and Mezzanotti (2014), and Nanda et. al (2014). 
 
+\section{Historical Background}
+In order to justify certain assumptions in the model, it is important to briefly discuss the historical background of the period.
+\subsection{The Great Depression}
+\indent The Great Depression began with the stock market crash of October 1929; what initially began as a stable decline in the S\&P Stock Index culminated with a financial panic on October 29, in which investors began trading and selling securities at great volume. The panic was by no means restricted to the financial sector. By the time October of the following year arrived, income, prices, and production had fallen 16, 14, and 26 percent respectively. Still, up to that point, there had only been a 2 percent decrease in bank deposits; the banking sector was relatively untouched by declining economy. That changed after November 1930, when a series of bank failures in different states led to widespread bank runs throughout the rest of the country. (Freidman and Schwartz, 9-12). This in turn led to fire sales on the part of banks: the end of 1930 say a marked increase in corporate bond yields and a steady decline government bond yields, which might have implied that banks were selling off illiquid assets to keep up with depositor demand, while flying to safer and more liquid government bonds. 
+\\
+\indent In the absence of active intervention by the Federal Reserve System, a second banking crisis occurred in March 1931. Consumers began again to rapidly withdraw their deposits, while banks continued to sell off corporate bonds and fly to government bonds in response. Between February and August 1931, the deposits of commericial declined roughly 7 percent, or \$2.7 billion. (Freidman and Schwartz, 17-19). The detrimental effects on bank health of the sustained decrease in commercial bank deposits was compunded when Britain left the gold standard in Sepetember 1931. This lead foreign investors and entities to withdraw U.S. holdings in the form of gold from U.S. banks, which in turn further depleted U.S. bank reserves. Freidman and Schwartz note that between August 1931 and January 1932, ``1,860 banks with deposits of \$ 1.449 million suspended operations, and the deposits of those banks that managed to keep afloat fell by a much larger sum" (21). 
+\\
+\indent In order to counter the severe depletion of U.S bank balance sheets, the Federal Reserve started purchasing bonds on the open market at great volume in April 1932. The economic repreive proved to be temporary though, and more banks began to close in the end of 1932, into the beginning of 1933. This banking panic proved to be far more severe than before, partially because of the already weakened state of many banks, but also because of the degree to which bank reserves were futher depleted. By March 1933, many banks, along with the Federal Reserve System, temporarily closed down, unable to engage in any more transactions. The worst of the banking crisis ended with President Roosevelt's declaration of a national banking holiday on March 6. (Freidman and Schwartz, 26-32). 
+\\
+\indent The sequence of events discussed at length in this section is directly relevant to my model. A key component of my model assumes that shocks to the banking system occurred after 1929. As Freidman and Schwartz emphasize, the two main banking crises occurred between 1930 and 1931. Therefore, introducing bank distress in 1930, as opposed to 1931 or 1932, is a reasoable assumption to make.
+
+\subsection{The Structure of the U.S. Banking System}
+Leading up to the Great Depression, the U.S. Banking System was highly fragmented between local, state-chartered banks, and national banks (known as the dual-banking system). Furthermore, interstate and within-state branching was uncommon and often non-existent \href{https://www.richmondfed.org/~/media/richmondfedorg/publications/research/economic_review/1990/pdf/er760601.pdf}{(Mengle, 1990)}. From 1836, when the charter of the Second Bank of the U.S. was not renewed, to the inception of the National Bank Act of 1863, any bank with a state charter could issue their own bank notes, provided it was backed by state bonds. Most of these banks were not incoporated in the national bank system. The bank notes these unincorporated banks issued were used as currency throughout the Untied States. For this reason, the period of 1836-1863 is often called the Free Banking Era \href{http://faculty.som.yale.edu/garygorton/documents/Pricingfreebankingnotes.pdf}{(Gorton, 1999)}. 
+\\
+\indent In an effort to force these independent state banks to enter the national banking system, a 10 percent tax was issued on all state bank notes in 1865. As a result the number of state banks, where state banks included all banks chartered by state law, declined to 247 by 1868. The period between the end of the Civil War and 1913 saw a resurgence in state banking and the dual banking system between local and national banks. State banks became depository institutions instead of issuing bank notes, and able to compete with national banks due to less stringent state banking laws, among other factors. For example, in many states, state banks faced substantially lower capital requirements than national banks  \href{https://fraser.stlouisfed.org/files/docs/historical/federal\%20reserve\%20history/frcom_br_gp_ch_banking/dual_banking_system_us.pdf}{(Federal Reserve, 1932)}.
+\\
+\indent Importantly, the new banking system created after the Civil War was almost completely made up of unit banks. The Currency Act of 1900 saw a marked increase in unit banks. As the number of unit banks continued to grow from 1900 to the 19020's, state branch banking occurred more often as well. Unit banks strongly opposed branch banks, due to the compeition they posed, and as result successfully lobbied for the ban of branch banking on the state and national level during the 1920's. The 1924 Supreme Court case \textit{First National in St. Louis v. State of Missouri} confirmed that national bank branching was illegal. \href{https://www.richmondfed.org/~/media/richmondfedorg/publications/research/economic_review/1990/pdf/er760601.pdf}{(Mengle, 1990)}.
+\\
+\indent This discussion of the history of U.S. Banking is intended to substantiate two key facts about U.S. Banking in the years leading to the Great Depression. First of all, the banking system was highly fragmented and there were numerous banks on the state and local level under state law that competed with national banks. Therefore, the financing these banks provided to firms was most likely not negligible. Second, the abolition or restriction of bank branching across and within states meant that bank distress varied across geography, and bank-specific sources of distress were often isolated to the regional level. These facts will inform my identification strategy. Table 1 reports state branching laws for 1910 and 1929.
+\\
+
 \section{Tables}
+
+
+\captionsetup{width=6cm}
+\begin{table} [!htbp] \centering                                                                    
+ \caption{Restrictions on Branch Banking, by State}                                                                           
+ \label{}                                                                                       
+ \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }                        
+ \\[-1.8ex]\hline                                                                                                                                            
+ \\[-1.8ex]  & \multicolumn{1}{c}{1910} & \multicolumn{1}{c}{1929} & \multicolumn{1}{c}{}\\    
+ \hline \\[-1.8ex]                                          
+Alabama & & X \\
+Alaska & & \\
+Arizona & & * \\
+Arkansas & & X \\
+California & * & * \\
+Colorado & X & X \\
+Connecticut & X & X \\
+Delaware & * & *\\
+Florida & * & X \\
+Georgia & * & O \\
+Hawaii & & \\
+Idaho & & X \\
+Illinois & & X \\
+Indiana & & X \\
+Iowa & & X\\
+Kansas & X \\
+Kentucky & & \\
+Louisiana & O & O \\
+Maine & O & O \\
+Maryland & & * \\
+Massachusetts & X & O \\
+Michigan &  & \\
+Minnesotsa & & X \\
+Mississippi & X & O \\
+Missouri & X & X \\
+Montana &  & X \\
+\hline \\[-1.8ex]
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular}
+\caption*{This table reports state branching laws over time. The data is directly from \href{https://www.richmondfed.org/~/media/richmondfedorg/publications/research/economic_review/1990/pdf/er760601.pdf}{(Mengle, 1990)}. \\ X: Only Unit Banking is Allowed; O: State Bank Branching Allowed, but Restrained; *: Branching Permitted Throughout State}
+\end{table} 
+
+\captionsetup{width=6cm}
+\begin{table} [!htbp] \centering                                                                    
+ \caption{Restrictions on Branch Banking, by State (Continued)}                                                                           
+ \label{}                                                                                       
+ \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }                        
+ \\[-1.8ex]\hline                                                                                                                                            
+ \\[-1.8ex]  & \multicolumn{1}{c}{1910} & \multicolumn{1}{c}{1929} & \multicolumn{1}{c}{}\\    
+ \hline \\[-1.8ex]                                          
+Nebraska & & X \\
+Nevada & X & X \\
+New Hampshire &  & \\
+New Jersey & & O \\
+New Mexico & & X \\
+New York & O & O \\
+North Carolina & & * \\
+North Dakota & & \\
+Ohio & & O \\
+Oklahoma & & \\
+Oregon & * & X \\
+Pennsylvania & X & O \\
+Rhode Island & * & * \\
+South Carolina & & * \\
+South Dakota & & \\
+Tennessee & * & O \\
+Texas & X & X \\
+Utah & & X \\
+Vermont & & * \\
+Virginia & & * \\
+Washington & * & X \\
+West Virginia & & X \\
+Wisconsin & X & X \\
+Wyoming & & \\
+\hline \\[-1.8ex]
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular}
+\caption*{This table reports state branching laws over time. The data is directly from \href{https://www.richmondfed.org/~/media/richmondfedorg/publications/research/economic_review/1990/pdf/er760601.pdf}{(Mengle, 1990)}. \\ X: Only Unit Banking is Allowed; O: State Bank Branching Allowed, but Restrained; *: Branching Permitted Throughout State}
+\end{table} 
+
 \captionsetup{width=12.5cm}
 
   % Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu"
@@ -191,9 +290,64 @@ R-squared  &   \multicolumn{1}{c}{0.6923}  \\
 \caption*{Table 3 reports fixed effects regression coefficients of log labor for every other year from 1929 to 1935, on the interaction of a high external financial dependence dummy variable with the previous measure of bank distress in tabe 1. Firms in industries with levels of external financial dependence above the industry sample median of 0.04 are categorized as highly dependent on external financing. See table 4 for levels of external financial dependence by industry within the sample. Robust standard errors are clustered at the county level.}
 \end{table} 
 
+\captionsetup{width=10cm}                                                                     
+\begin{table}[!htbp] \centering                                                                       
+\caption{Measure of Dependence on External Finance by Industry}                                                          
+\label{}                                                                                         
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+ \\[-1.8ex]\hline  
+ \hline \\[-1.8ex] 
+ \\[-1.8ex] \multicolumn{1}{c}{Industry} & \multicolumn{1}{c}{Dependence on External Finance} \\
+  \\[-1.8ex] & \multicolumn{1}{c}{For Mature Companies} \\
+ \hline \\[-1.8ex]                                                                             
+ Automobiles & 0.14 \\  
+ Aviation & 0.23 \\
+ Blast Furnaces & 0.22 \\ 
+ Bone Black & 0.05 \\
+ Cane Sugar & -0.10 \\
+ Cement & 0.15 \\
+ Cigars and Cigarettes & -0.12 \\
+Concrete & 0.15 \\
+Glass & 0.03 \\
+Ice & -0.10 \\
+Ice Cream & -0.10 \\
+Linoleum & 0.10 \\
+Macaroni & -0.10 \\
+Malt & -0.10 \\
+Matches & -0.05 \\
+Petroleum Refining & 0.07 \\
+Radio & 0.39 \\
+Rubber Tires & -0.12 \\
+Soap & -0.05 \\
+Steel Works & 0.07 \\
+Sugar, Refining & -0.07 \\
+Textiles & 0.14 \\
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\caption*{Table 4 reports dependence on external finance by industry. Values are from Table A3 of Nanda and Nicholas (2014), which in turn are based on calaulcated values from Rajan and Zingales (1998), for mature companies. When an industry in the sample fell into multiple industry categories from Nanda and Nicholas, the average of those measures was used. Rajan and Zingales define a company's dependence on external finance to be its capital expenditures minus cash generated from operations, divided by total capital expenditures. They calculate the measure for both young and mature firms during the 1980's.}
+\end{table} 
+
 \section{Figures}
+\begin{center}
+\includegraphics[width=1\textwidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Bank Distress Spatial Map".pdf}
+\end{center}
 
+\begin{center}
+\includegraphics[width=1\textwidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Average Change in Employment by Industry".pdf}
+\end{center}
 
+\begin{center}
+\includegraphics[width=1\textwidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Average Change in Revenue by Industry".pdf}
+\end{center}
+
+\begin{center}
+\includegraphics[width=1\textwidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Number of Firms per year".pdf}
+\end{center}
+
+\begin{center}
+\includegraphics[width=1\textwidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Bank Distress v External Financial Dependence".pdf}
+\end{center}
 }
 
 \end{document}

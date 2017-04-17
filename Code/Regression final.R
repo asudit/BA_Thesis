@@ -379,5 +379,5 @@ for(i in 1:length(levels(panel$industry)))
 
 }
 d$coeff <- as.numeric(d$X2)
-ggplot(data =d, aes(x=X3, y=coeff, group=1)) +  geom_point()+ geom_smooth(method='lm')+ xlab("External Financial Dependence") + ylab("Bank Distress Coefficient") + ggtitle("Effects of Bank Distress on Employment, by Industry") 
+ggplot(data =d, aes(x=X3, y=coeff, group=1)) +  geom_point()+ geom_smooth(method='lm')+ xlab("External Financial Dependence") + ylab("Bank Distress Coefficient") + ggtitle("Effects of Bank Distress on Employment v. External Financial Dependence by Industry") 
 
