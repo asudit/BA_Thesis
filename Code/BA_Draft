@@ -1,0 +1,547 @@
+
+\documentclass[letter,11pt]{article}
+%\selectlanguage{english}
+
+\AtBeginDocument{\setstretch{1.5}}
+
+%%% PACKAGES %%%
+\usepackage[english]{babel} % hyphenation
+\usepackage[margin=2cm]{geometry} % margins
+\usepackage{graphicx} % support for graphics
+\usepackage{amsmath} % support for math­e­mat­i­cal typesetting
+\usepackage{amssymb} % math­e­mat­i­cal symbols
+\usepackage{color} % support for colors
+\usepackage{mathtools} % more math­e­mat­i­cal type­set­ting
+\usepackage{amsthm} % for defining theorem-like environments
+\usepackage{enumerate} % change appearance of numbered lists
+\usepackage{framed} % textboxes
+\usepackage[format=plain,labelfont=bf,up]{caption} % cus­tomise cap­tions for fig­ures and ta­bles
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue,linktoc=all, citecolor=black]{hyperref} % hyperlinks
+\usepackage[usenames,dvipsnames]{xcolor} % more colors
+\usepackage{setspace} % set­ting the spac­ing be­tween lines
+\usepackage{titlesec} % sec­tion­ing com­mands
+\usepackage{subfigure} % multiple figures arranged neatly
+\usepackage{natbib} % references
+\usepackage{pdfpages} % import pages from other pdf fiels
+\usepackage{comment} % comment out large sections
+\usepackage{cancel} % strikethrough math
+\usepackage{verbatim} % for including code
+\usepackage{titlesec} % change font size of section
+\usepackage{dcolumn}
+\usepackage{pdfpages}
+\usepackage{listings}
+\usepackage[autostyle, english = american]{csquotes}
+\usepackage{threeparttable}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{float}
+
+
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+%%% CUSTOM COMMANDS %%%
+\def\ci{\perp\!\!\!\perp} % statistical independence symbol
+\def\nci{\perp\!\!\!\!\!\!\diagup\!\!\!\!\!\!\perp}
+\newcommand{\ind}{1\hspace{-2.1mm}{1}} % indicator function
+\newcommand{\rl}{\mathbb{R}} % real numbers
+\newcommand{\ex}[1]{\mathbb{E} \left[ #1 \right]} % expectation operator
+\newcommand{\pr}[1]{\mathbb{P} \left( #1 \right)} % probability
+\newcommand{\var}[1]{\mathbb{V}\text{ar} \left[ #1 \right]} % variance
+\newcommand{\cov}[1]{\mathbb{C}{ov} \left[ #1 \right]} % covariance
+\newcommand{\corr}[1]{\mathbb{C}{orr} \left[ #1 \right]} % correlation
+\newcommand{\tab}{\hspace{.4cm}}
+\newcommand{\lra}{\text{ }\Leftrightarrow\text{ }}
+\newcommand{\ra}{\text{ }\Rightarrow\text{ }}
+\newcommand{\la}{\text{ }\Leftarrow\text{ }}
+\newcommand{\veps}{\varepsilon}
+\newcommand{\spc}{\text{ }}
+
+
+%%% SET FONT %%%
+\renewcommand{\familydefault}{\sfdefault}
+\linespread{1.2}
+\setlength{\parindent}{0pt}
+\usepackage{sfmath}
+\titleformat*{\section}{\normalsize\bfseries}
+\titleformat*{\subsection}{\normalsize\bfseries}
+\titleformat*{\subsubsection}{\normalsize\bfseries}
+\titleformat*{\paragraph}{\normalsize\bfseries}
+\titleformat*{\subparagraph}{\normalsize\bfseries}
+
+%%% SET INDENT %%%
+\setlength\parindent{24pt}
+
+
+\begin{document}
+{\fontfamily{cmr}\selectfont
+
+
+\title{\large \textbf{Bank Distress and Unemployment During the Great Depression:\\ A Plant-Level Approach\footnote{I thank Richard Hornbeck for his invaluable comments and suggestions, as well Victor Lima, Kotaro Yoshida, Ezra Karger, and Kenneth Jung. I thank Nicolas Ziebarth and Chris Vickers for sharing their data with me.}}\\Adam Sudit
+\\
+\begin{center}
+\begin{abstract}
+\begin{small}
+This paper examines the effects of restricted loan supply, as measured by bank distress, on  employment in the manufacturing sector during the Great Depression. Numerous banks failed or were suspended during the Great Depression, leading to the restriction of credit to manufacturers. Without access to credit, firms found it more difficult to fund their operations, and were forced to lay off workers in order to remain open. I find that from 1929-1935, firms in counties with greater bank distress saw a larger decrease in employment. Including industry fixed effects in the model causes this result to vanish, indicating that during a financial crisis, industry-specific characteristics like capital intensity and dependence on external finance may be as relevant to a firm's operations as credit restrictions.
+\end{small}
+\end{abstract}
+\end{center}
+\vskip-.2cm}
+\date{}
+\maketitle
+
+\section{Introduction}
+\indent It is no secret that financial crises, like the Great Depression, have devastating effects on real economic activity. What is less clear is through which mechanisms a financial crisis affects the economy. Freidman and Schwartz (1963) posited that monetary channels, and in particular decreased money supply, played an important role in the severity of the Great Depression.  
+\\
+\indent \href{https://www.jstor.org/stable/1808111?seq=1#page_scan_tab_contents}{Bernanke (1983)} redefined the literature by showing that while monetary channels are important to establishing a connection between financial crisis (specifically bank distress) and economic activity, non-monetary channels have a significant role to play as well. His key idea is that of the cost of intermediation in incomplete markets; as the transaction costs inherent to an incomplete market like bank lending increase in the wake of financial panic, the acquisition of credit becomes prohibitively expensive.
+\\
+\indent How the financing constraints firms and households face during times of economic crisis influence their well-being has been of considerable interest to researchers. \href{http://s3.amazonaws.com/academia.edu.documents/46105816/monetarypolicy.pdf?AWSAccessKeyId=AKIAIWOWYYGZ2Y53UL3A&Expires=1492524569&Signature=aBXzQ2UvFRKnToeBPvx8tGucLXk%3D&response-content-disposition=inline%3B%20filename%3DMonetary_Policy_and_Credit_Conditions_Ev.pdf}{Kashyap et. al} show that lending constraints affect firm investment. \href{https://www.jstor.org/stable/2109844?seq=1#page_scan_tab_contents}{Bernanke, Gertler, and Gilchrist} further develop the theory with the idea of a financial accelerator, in which relatively small shocks to the economy can be exacerbated by the market for credit. They show that when borrowers cannot obtain external financing in the wake of one of these shocks, they experience decreases in output.
+\\
+\indent One body of literature has used natural experiments to identify exogenous shocks to lending channels, one source of external finance. \href{https://www.aeaweb.org/articles?id=10.1257/aer.90.1.30}{Peek and Rosengren} measure the effect of a shock within the Japanese banking sector on commercial real estate markets within the United States. \href{https://www.aeaweb.org/articles?id=10.1257/000282805775014326}{Ashcraft} measures the effect of small bank closures on local economic outcomes in Texas by using FDIC intervention on the state level as an exogenous source of bank failure on the local level. More recently, \href{https://www.aeaweb.org/articles?id=10.1257/aer.98.4.1413}{Khwaja and Mian} employ a new empirical strategy to isolate loan supply effects from loan demand effects on the firm level by exploiting variation in bank exposure to liquidity shocks across banks lending to the same firm. They find that a firm's ability to obtain loans from alternative sources in the wake of a liquidity shock affects the extent to which a firm subsequently declines, and that smaller firms are therefore worse off than larger firms in the wake a liquidity shock.
+\\
+\indent The effects of restricted financing opportunities on firm employment has also been studied. Among others, \href{https://scholar.harvard.edu/chodorow-reich/publications/employment-effects-credit-market-disruptions-firm-level-evidence-2008-09}{Chodorow-Reich} finds that the ability of a firm to obtain credit in the wake of the collapse of Lehman Brothers directly influenced uemployment outcomes within those firms. Firms that had access to credit from healthier lenders before the collapse did not lay off as many employees, relative to firms with access to credit from less financially stable lenders.
+\\
+\indent Returning to the Great Depression, there has been a resurgence of papers about the period in the last decade. The dearth of data on direct loan channels between banks and firms has led to a series of novel approaches for evaluating how contractions in loan supply can affect various measures of economic activity. \href{https://www0.gsb.columbia.edu/faculty/ccalomiris/papers/Consequences%20of%20U.S.%20Bank%20Distress%20During%20the%20Depression.pdf}{Calomiris and Mason} reinvigorated the literature by using a variety of instruments for state-level bank loan supply to show that bank distress had a significant effect on changes in state income. \href{http://pubs.aeaweb.org/doi/pdfplus/10.1257/mac.5.1.81}{Ziebarth} uses variation in Federal policy across different districts of Mississippi to study the effect of bank distress on firm revenue. In a working paper, \href{http://www.nber.org/papers/w23216.pdf}{Benmelech et. al} use variation in the maturity dates of corporate bonds that firms held during the Great Depression as a proxy for credit supply. \href{http://www.kellogg.northwestern.edu/faculty/mezzanotti/documents/lee_mezzanotti_greatdepression.pdf}{Lee and Mezzanotti}, and \href{http://www.people.hbs.edu/tnicholas/bank_distress.pdf}{Nanda and Nicholas} use firm-level manufacturing data to study firm level employment and patent outcomes, respectively.
+\\
+\indent This paper constributes to the recent body of literature by using a novel plant-level dataset from the Census of Manufacturers\footnote{Nicolas Ziebarth and Chris Vickers generously shared these data with me} to measure how restricted loan supply, as proxied by bank distress, affects firm-level employment, following a similar methodology to  \href{http://www.kellogg.northwestern.edu/faculty/mezzanotti/documents/lee_mezzanotti_greatdepression.pdf}{Lee and Mezzanotti} and \href{http://www.people.hbs.edu/tnicholas/bank_distress.pdf}{Nanda and Nicholas}. While Nanda and Nicholas conduct their study at the firm-level, they are only able to incorporate 2,064 firms across 6 inustries into their analysis. Lee and Mezzanotti's paper is able to incorporate more industries, but is restricted to the city-level. By using firm data on the county-level in conjunction with FDIC bank data at the county-level, I fully exploit variaton in bank distress at it's most granular level into my identification strategy. Furthermore, by incorporating data across 22 industries, I more effectively control for industry fixed effects, and paint a more complete picture of the havoc the Great Depression wrought upon the entire manufacturing sector.  
+\\
+\indent My results show that contractions in loan supply as measured by bank distress did indeed have a negative effect on employment, even after instrumenting for bank distress. Interestingly, including industry fixed-effects into the main specification eliminates the statistical significance of these results, which indicates that industry characteristics play an important role in evaluating the severity of financial constraints on firm activity during an economic crisis.
+
+\section{Historical Background}
+In order to justify certain assumptions in the model, it is important to briefly discuss the historical background of the Great Depression.
+\subsection{The Great Depression \footnote{My discussion of the history of the Great Depression is based directly on Freidman and Schwartz's overview. More details can be found in Freidman and Scwartz's \textit{The Great Contraction, 1929-1933}}}
+\indent The Great Depression began with the stock market crash of October 1929; what initially began as a stable decline in the S\&P Stock Index culminated with a financial panic on October 29, in which investors began trading and selling securities at great volume. The panic was by no means restricted to the financial sector. By the time October of the following year arrived, income, prices, and production had fallen 16, 14, and 26 percent respectively. Still, up to that point, there had only been a 2 percent decrease in bank deposits; the banking sector was relatively untouched by the declining economy. That changed after November 1930, when a series of bank failures in different states led to widespread bank runs throughout the rest of the country. (Freidman and Schwartz, 9-12). This in turn led to fire sales on the part of banks: the end of 1930 say a marked increase in corporate bond yields and a steady decline in government bond yields, which might have implied that banks were selling off illiquid assets to keep up with depositor demand, while flying to safer and more liquid government bonds. 
+\\
+\indent In the absence of active intervention by the Federal Reserve System, a second banking crisis occurred in March 1931. Consumers began again to rapidly withdraw their deposits, while banks continued to sell off corporate bonds and fly to government bonds in response. Between February and August 1931, the deposits of commericial banks declined roughly 7 percent, or \$2.7 billion. (Freidman and Schwartz, 17-19). The detrimental effects on bank health of the sustained decrease in commercial bank deposits was magnified when Britain left the gold standard in Sepetember 1931. This led foreign investors and entities to withdraw U.S. holdings in the form of gold from U.S. banks, which in turn further depleted U.S. bank reserves. Freidman and Schwartz note that between August 1931 and January 1932, ``1,860 banks with deposits of \$ 1.449 million suspended operations, and the deposits of those banks that managed to keep afloat fell by a much larger sum" (Freidman and Schwartz, 21). 
+\\
+\indent In order to counter the severe depletion of U.S bank balance sheets, the Federal Reserve started purchasing bonds on the open market at great volume in April 1932. The economic repreive proved to be temporary though, and more banks began to close in the end of 1932, and into the beginning of 1933. This banking panic proved to be far more severe than before, partially because of the already weakened state of many banks, but also because of the degree to which bank reserves were futher depleted. By March 1933, many banks, along with the Federal Reserve System, temporarily closed down, unable to engage in any more transactions. The worst of the banking crisis ended with President Roosevelt's declaration of a national banking holiday on March 6. (Freidman and Schwartz, 26-32). 
+\\
+\indent The sequence of events discussed at length in this section is directly relevant to the main model. A key component of the model assumes that shocks to the banking system occurred after 1929. As Freidman and Schwartz emphasize, the two main banking crises occurred between 1930 and 1931. Therefore, introducing bank distress in 1930, as opposed to 1931 or 1932, is a reasonable assumption to make.
+
+\subsection{The Structure of the U.S. Banking System}
+Leading up to the Great Depression, the U.S. Banking System was highly fragmented between local, state-chartered banks, and national banks (known as the dual-banking system). Furthermore, interstate and within-state branching was uncommon and often non-existent \href{https://www.richmondfed.org/~/media/richmondfedorg/publications/research/economic_review/1990/pdf/er760601.pdf}{(Mengle, 1990)}. From 1836, when the charter of the Second Bank of the U.S. was not renewed, to the inception of the National Bank Act of 1863, any bank with a state charter could issue their own bank notes, provided it was backed by state bonds. Most of these banks were not incoporated in the national bank system. The bank notes these unincorporated banks issued were used as currency throughout the Untied States. For this reason, the period of 1836-1863 is often called the Free Banking Era \href{http://faculty.som.yale.edu/garygorton/documents/Pricingfreebankingnotes.pdf}{(Gorton, 1999)}. 
+\\
+\indent In an effort to force these independent state banks to enter the national banking system, a 10 percent tax was issued on all state bank notes in 1865. As a result the number of state banks, where state banks included all banks chartered by state law, declined to 247 by 1868. The period between the end of the Civil War and 1913 saw a resurgence in state banking and the dual banking system between local and national banks. State banks became depository institutions instead of issuing bank notes, and able to compete with national banks due to less stringent state banking laws, among other factors. For example, in many states, state banks faced substantially lower capital requirements than national banks  \href{https://fraser.stlouisfed.org/files/docs/historical/federal\%20reserve\%20history/frcom_br_gp_ch_banking/dual_banking_system_us.pdf}{(Federal Reserve, 1932)}.
+\\
+\indent Importantly, the new banking system created after the Civil War was almost completely made up of unit banks. The Currency Act of 1900 saw a marked increase in unit banks. As the number of unit banks continued to grow from 1900 to the 1920's, state branch banking occurred more often as well. Unit banks strongly opposed branch banks, due to the compeition they posed, and as result successfully lobbied for the ban of branch banking on the state and national level during the 1920's. The 1924 Supreme Court case \textit{First National in St. Louis v. State of Missouri} confirmed that national bank branching was illegal. \href{https://www.richmondfed.org/~/media/richmondfedorg/publications/research/economic_review/1990/pdf/er760601.pdf}{(Mengle, 1990)}. Even after national banks were allowed to create branches in the localities near their headquarters following the passage of The McFadden Act of 1927 (if branching was already legal in the given state), national bank branching within a single state remained significantly limited \href{https://www.jstor.org/stable/pdf/3875046.pdf}{(Mitchener, 2005)}.
+\\
+\indent This discussion of the history of U.S. Banking is intended to substantiate two key facts about U.S. banking in the years leading to the Great Depression. First of all, the banking system was highly fragmented and there were numerous banks on the state and local level under state law that competed with national banks. Therefore, the financing these banks provided to firms was most likely not negligible. Second, the abolition or restriction of bank branching across and within states meant that many banks were composed of a single office in a given county, and that bank-specific sources of distress were often isolated to the regional level. These facts will inform my identification strategy. Tables 4 and 5 report state branching laws for 1910 and 1929. They show that in 1929, the majority of states either outlawed within-state branching or placed limits on its extent.
+
+\section{Data and Summary Statistics}
+
+\indent Firm-level measures of labor, revenue, and industry are from the U.S. Census of Manufacturers, for 1929, 1931, 1933, and 1935. Table 1 includes summary statistics for the census sample. Revenue is reported as total value added, which I adjust for inflation using the consumer price index. The labor measure is reported as the number of wage earners per month, which I then aggregate to create an annualized labor measure.
+\\
+\indent An important feature of the data is the number of diverse industries within the sample. The 22 represented industries are highly heterogenous in terms of capital and labor intensity, length of business cycle, product durability; they also serve different sectors of the economy, from aviation and petroleum to food. The variation in industry characteristics provides a more complete picture of manufacturing activity in the U.S. during the Great Depression.
+\\
+\indent Data on bank suspensions, total number of banks, and deposits on the county level comes from the FDIC Data on Banks in the United States, available on the ICSPR. Tables 2 and 3 report number of bank suspensions and number of banks suspended as a percentage of total banks, respectively. In general, we see that bank suspensions rose sharply between 1929 and 1930, receeded in 1931, and then rose even further in 1932. As the tables also show, there was also significant variation by region of the United States.
+\\
+\indent Ideally, I would use county level loan data to identify the credit channel between banks and firms. Unfortunately, as far I know these data does not exist. Based on previous work in the literature\footnote{See \href{http://www.people.hbs.edu/tnicholas/bank_distress.pdf}{Nanda and Nicolas, 2014} and \href{http://scholar.harvard.edu/files/jglee/files/lee_mezzanotti_bank_distress_manufacturing_0.pdf}{Lee and Mezzanotti, 2014}.}, I construct the following county-level measure of bank distress:
+\begin{align*}
+BankDistress_c = \frac{\sum_{t=1930}^{1935} BankSuspensions_{c, t}} {Banks_{c, 1929}}\
+\end{align*}
+\indent In other words, this measure of bank distress is a fixed county characteristic, in which I normalize the sum of the number of banks suspended from 1930-1935 in a given county by the number of banks in the same county during 1929. I include bank suspensions in 1934 and 1935 to account for any residual effects on bank health from the height of the Great Depression, and to ensure the measure spans the entirety of the census data. The vast majority of bank suspensions occurred between 1930-1933, so including 1934 and 1935 would not lead to overstated results. Figure 1 maps this measure of bank distress to all counties in the sample. The map illustrates the considerable geographic variation in the level of bank distress. The FDIC data is quite useful in painting a complete picture of bank distress across the United States because it has data on all banks, regardless of whether they were part of the Federal Reserve System or not. Conistent with the literature, I do not discriminate between bank suspensions and bank failures.
+
+\section{Methodology}
+\subsection{Fixed Effects}
+I start with a fixed effects specification in order to control for county, industry, and time-specific shocks to manufacturing activity: 
+\begin{align*}
+log(L_{jt}) = \beta_{0t} + \beta_{1t} Post\_1929XBank\_Distress_c + \gamma_t + \mu_c +\eta_i  + \epsilon_{ct}
+\end{align*}
+\indent where $log(L_{jt})$ is log labor in period t for firm j, $Post\_1929$ is a indicator variable for whether the observation is after 1929,  and $\gamma_t$, $\mu_c$, and $\eta_i$ are year, county, and industry fixed effects, respectively. The indicator variable allows me to ``treat" the firms within my sample with shocks to local financing at the onset of the first banking crisis in October 1930. The effect of interest is therefore the interaction effects between $Post\_1929$ and the measure of bank distress. Because I am studying the effects of bank distress on firm employment decisions over time, I restrict my sample (as I will do for the rest of the paper) to firms that were open in 1929. Standard errors are clustered by county using heteroscedasticity-consistent standard errors. 
+\\
+\indent Implicit in this empirical specification is the assumption that bank distress is contained to the county level. My discussion of the U.S. banking system provides evidence for this assumption. Restrictions on statewide branching, a national prohibition of interstate branching, and preponderence of small, unit banks meant that many banks were restricted to local operations. As a result of this considerable fragmentation, local, bank-specific shocks most likely did not spill over into other localities. 
+
+\subsection{Instrumental Variables}
+\indent A serious concern with the empirical specification in the previous section is one of reverse casuality. One could argue that because each firm in my sample was relatively small and most likely did not take out loans that made up a significant portion of a bank's balance sheet, a firm defaulting on its loans to a bank would not have causes that bank to fail. Still, it is undeniable that banks were more likely to fail or suspend operations in counties with great disruptions in manufacturing activity. Among other things, distressed manufacturing firms were more likely to default on bank loans, causing bank balance sheet health to deteriorate. Since my identification strategy exploits geogrpahic variation in bank distress to identify the credit channel, instead of explicitly identifying a firm's dependence on external finance, the directionality of bank distress to firm distress may still be in question.
+\\
+\indent The economic history literature has dealt with this issue in a variety ways; one method is to create an instrumental variable based on the proportion of a bank's assets tied to real estate. As Calomiris and Mason note, the size of a bank's assets is an important determinant of the future supply of bank loans, and the fraction of a bank's assets in real estate in particular indicates to extent to which debtors defaulted on their loans in the past, leading to the seizure of their real estate assets. Therefore, real estate assets indirectly represent the past and future supply of loans. \href{https://www0.gsb.columbia.edu/faculty/ccalomiris/papers/Consequences%20of%20U.S.%20Bank%20Distress%20During%20the%20Depression.pdf}{Calomiris and Mason} show that the proportion of a bank's assets in real estate is a robust loan-supply instrument. \href{http://eh.net/eha/wp-content/uploads/2013/11/Mladjan.pdf}{Mladjan} uses changes in the value of farmland over the 1910's as an instrument for bank failures. 
+\\
+\indent I use change in mortgage debt per acre from 1910 to 1920 (on the county level) as an instrument for bank distress, from \href{http://pubs.aeaweb.org/doi/pdfplus/10.1257/aer.20120525}{Rajan and Ramcharan, 2015}. During the 1910's, the United States enjoyed a surge in land prices due increased agricultural exports to Europe after the decimation of World War I left much of European farmland in ruin. This real estate bubble burst in 1920, causing national farm income to plummet\footnote{See Rajan and Ramcharan, 2015 for a more in-depth discussion of the historical background.}. As Rajan and Ramcharan show, change in mortgage debt per acre from 1920-1910 is a good predictor of bank suspensions between 1920-1929. Taking that logic one step further, banks in counties with increased mortgage debt per acre most likely had weaker balance sheets leading up to the Great Depression, since farmers experiencing a drop in income after 1920 found it difficult to pay back their mortgages. As a result, these banks most likely experienced great levels of duress during the Great Depression. My instrument eliminates the issues stemming from reverse causality, since decreases in firm employment could not influence previous changes in mortgage debt. On the other hand, since the firms in my sample were not within the agricultural sector, the most plausible way in which mortgage debt per acre affected their operations was by weakening the balance sheets of their lending banks. I employ a two stage least squares regression to instrument bank distress with change in mortgage debt. Below is the first stage:
+\begin{align*}
+Post\_1929XBank\_Distress_c = \beta_{0t} + \beta_{1t} \Delta Mortgage\_Debt + \gamma_t + \mu_c +\eta_i  + \epsilon_{ct}
+\end{align*}
+It should be noted that agricultural debt could be highly correlated with county-level shocks during the Great Depression, since farmers could conceivably be burdened by debt from 20 years before. Most instruments tied to land values have similar issues with the exclusion restriction.
+
+\section{Estimation Results and Discussion}
+Tables 6 and 7 report estimation results for the fixed effects and instrumental variable specifications, respectively. Turning first to table 6, the negative sign of the interaction effects coefficients confirm that coontraction in loan supply (as proxied by bank distress) does indeed have a detrimental effect on employment at the firm level. Column (2) indicates that with year and county fixed effects, an increase of one standard deviation in bank distress in a given county coincided with a  statistically significant decrease in firm employment of 14.3 percent. A particularly interest result is that this result vanishes when industry fixed effects are included in column 3. Furthermore, the R-squared value considerably improves when industry fixed effects are included.
+\\
+\indent Why industry fixed-effects absorb the effects of the bank distress merits further discussion. One reason may be that the demand for goods in a given industry are more important to the health of  firm than access to loans. Furthermore, considerable heterogeneity in the elasticity of demand exists with respect to income for many of the goods associated with these industries. We would expect that people's elasticity of demand would be relatively inelastic for commodities or non-durable goods that are used quite often in daily life, and that as a result industries that produce these goods would be able compensate for less access to external finance with relatively steady demand for their goods. Examples from the sample would include cigars and cigarettes, matches, macaroni, and soap. Conversely, industries that make goods associated with a high elasticity of demand with respect to income may experience declines in demand that greatly overshadow any effects from bank distress, forcing firms to lay off their workers in great numbers. For example, while the auto industry might have found it difficult to procure loans, the fact that many households did not buy cars in the same number as they did before the Great Depression was probably far more detrimental to their operations.
+\\
+\indent Capital intensity and dependence on external finance might also be an important factor. Capital intensity varies considerably by industry, and in the absence of high sales, firms that required greater investment in fixed capital relative to their labor expenses may have experienced a substitution effect between labor and capital, in which they laid off relatively more workers in order to have enough capital for their capital intensive production processes. Within the sample, industries like automobiles, steel works, balst furnaces, radio, and aviation would have experienced this effect to a great degree. It is pluasible that this substitution effect was more influential in a firm's financing decisions than restricted access to financing, though one surely excaberated the other.
+\\
+\indent Turning to table 7, the statistically significant coefficient from the first stage regression indicates that change in mortgage debt is a strong instrument for bank distress, as predicted. Column 2 reports a large, statistically significant, and negative effect of instrumented bank distress on log labor, confirming the general results from table 6. Still, the coefficient in column 2 is quite large, and would imply that a one standard deviation increase in instrumented bank distress would coincide with a 250 percent decrease in employment. It may be the case that the intrumented bank distress variable does not suffer to as great as a degree from reverse casaulity, and better captures the large and negative effect of bank distress on employment. All the same, the size of the coefficient should be taken with a grain of salt, and the I.V. results should be viewed more as a robustness check than as stand alone results. 
+
+\section{Variation in Dependence on External Finance}
+\indent The results from the main specification suggest that industry-specific characteristics have an important role to play in firm employment outcomes. My data does indicate that substantial variation exists in employment outcomes and revenue levels across the industries in the sample. As figures 2 and 3 show, more traditionally capital intensive firms with a greater degree of dependence on external finance generally experienced greater decreases in revenue and employment over the course of the Great Depression.
+\\
+In order to explore this further, and hopefully better explain my main results, I use measures of external financial dependence by industry from \href{http://www.people.hbs.edu/tnicholas/bank_distress.pdf}{Nanda and Nicholas}\footnote{These values are in turn from \href{https://faculty.chicagobooth.edu/raghuram.rajan/research/papers/growth.pdf}{Rajan and Zingales, 1998}. More details can be found on table 9} to create a dummy variables for firms in industries with a high level of dependence on external finance, similar to the specification Nanda and Nicolas used. I then introduce the following specification to see if firms in industries with great dependence on external finance were more adversely affected by bank distress (bank distress being one form of external finance).
+\begin{align*}
+log(L_{jt}) = \beta_{0t} + \beta_{1t} Ext\_Fin\_Dependence_iXPost\_1929XBank\_Distress_c + \gamma_t + \mu_c +\eta_i  + \epsilon_{ct}
+\end{align*}
+Table 8 reports the results of this new specification. Row 1 reports the coefficient for the interaction effects between the measure of bank distress and the high external finance dependence dummy. There is a statistically significant and negative effect on log employment; the coefficient indicates that firms with greater capital intensity and higher level of dependence on external finance experienced a 28 percent greater decrease in employment with one standard deviation increase in bank distress than firms with low dependence. These results provide support for my discussion of the main results, and in particular that dependence on external finance or overall capital intensity is important in evaluating the effects of contricted loan supply on a firm's employment decisions. The very last figure demonstrates these results visually. 
+
+\section{Conclusions}
+This paper confirms the results of previous literature by showing that contractions in loan supply have a detrimental effect on employment within the manufacturing sector. Furthermore, by including industry fixed effects with a heterogeneous sample of 22 industries, this study sheds new light on the importance of industry specific determinants of production on firm-level employment outcomes during financial crises. Firms in industries with greater capital intensity and dependence on external finance laid off more workers in the wake of bank distress than firms with lower dependence. 
+
+\newpage
+
+\section{References}
+\begin{enumerate}
+\item[1] Ashcraft, Adam B. 2005. ``Are Banks Really Special? New Evidence from the FDIC-Induced Failure of Healthy Banks." The American Economic Review, 95(5): 1712-1730.
+\item[2] Benmelech, Efraim,  Carola Frydman, and Dimitris Papanikolaou (2017). ``Financial Frictions and Employment during the Great Depression." (NBER Working Paper No. 23216). Cambridge, MA: National Bureau of Economic Research.
+\item[3] Bernanke, Ben S. ``Non-Monetary Effects of the Financial Crisis in the Propagation of the Great Depression." The American Economic Review, Vol. 73, No. 3, (June 1983) pp. 257-276.
+\item[4] Bernanke, Ben, Mark Gertler, and Simon Gilchrist. ``The Financial Accelerator and the Flight to Quality." The Review of Economics and Statistics 78, no. 1 (1996): 1-15. doi:10.2307/2109844.
+\item[5] Board of Governors of the Federal Reserve System (U.S.). Committee on Branch, Group, and Chain Banking, 1935-. ``The Dual Banking System in the United States." Circa 1932.
+\item[6] Calomiris, Charles W. and Joseph R. Mason, 2001. ``Causes of U.S. Bank Distress During the Depression," Proceedings, Federal Reserve Bank of Chicago, issue May, pages 530-554.
+\item[7] \_\_\_. 2003. ``Consequences of Bank Distress During the Great Depression ." American Economic Review, 93(3): 937-947.
+\item[8] \_\_\_. 2003. ``Fundamentals, Panics, and Bank Distress During the Depression." American Economic Review, 93(5): 1615-1647.
+\item[9] Chodorow-Reich, Gabriel. 2014. “The Employment Effects of Credit Market Disruptions: Firm-level Evidence from the 2008-09 Financial Crisis.” Quarterly Journal of Economics 129 (1): 1-59.
+\item[10] Friedman, Milton, and Anna J. Schwartz. 1965. \textit{The Great Contraction, 1929-1933}. Princeton, N.J.: Princeton University Press.
+\item[11] Gorton, Gary. 1999. ``Pricing Free Bank Notes." Journal of Monetary Economics 44 (1): 33–64.
+\item[12] Kashyap, Anil; Stein, Jeremy and Wilcox, David W. ``Monetary Policy and Credit Conditions: Evidence from the Composition of External Finance." American Economic Review, March 1993, 83(1), pp. 78-98.
+\item[13] Khwaja, Asim Ijaz and Atif Mian. 2008. ``Tracing the Impact of Bank Liquidity Shocks: Evidence from an Emerging Market." American Economic Review, 98(4): 1413-42.
+\item[14] Lee, James and Filippo Mezzanotti. 2015. ``Bank Distress and Manufacturing: Evidence from the Great Depression." Working Paper. 
+\item[15] Mengle, David L. ``The Case for Interstate Branch Banking." Economic Quarterly (Federal Reserve Bank of Richmond) : November-December 1990, Vol. 76.
+\item[16] Mitchener, K. (2005). ``Bank Supervision, Regulation, and Instability During the Great Depression." The Journal of Economic History, 65(1), 152-185. doi:10.1017/S0022050705050060
+\item[17] Mladjan, Mrdjan M. 2011.``Accelerating into the Abyss: Financial Dependence and the Great Depression." Working Paper.
+\item[18] Nanda, Ramana, and Tom Nicholas. ``Did Bank Distress Stifle Innovation During the Great Depression?" Journal of Financial Economics 114, no. 2 (November 2014): 273–292.
+\item[19] Peek, Joe and Eric S. Rosengren. 2000. ``Collateral Damage: Effects of the Japanese Bank Crisis on Real Activity in the United States." American Economic Review, 90(1): 30-45.
+\item[20] Rajan, Raghuram and Rodney Ramcharan. ``The Anatomy of a Credit Crisis: The Boom and Bust in Farm Land Prices in the United States in the 1920s." American Economic Review. Apr 2015, Vol. 105, No. 4: Pages 1439-1477.
+\item[21] Rajan, Raghuram G., and Luigi Zingales. ``Financial Dependence and Growth." The American Economic Review 88, no. 3 (1998): 559-86. http://www.jstor.org/stable/116849.
+\item[22] Ziebarth, Nicolas L. ``Identifying the Effects of Bank Failures from a Natural Experiment in Mississippi during the Great Depression." American Economic Journal: Macroeconomics. Jan 2013, Vol. 5, No. 1: Pages 81-101
+\end{enumerate}
+
+\newpage
+\section{Tables and Figures}
+
+\begin{table}[!htbp] \centering                                                                       
+\caption{Census Data Summary Statistics}                                                          
+\label{}                                                                                         
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+ \\[-1.8ex] Category & \multicolumn{1}{c}{Statistic} \\
+ \hline \\[-1.8ex]                                                                             
+ Observations & \multicolumn{1}{c}{45,213} \\
+ Firms & \multicolumn{1}{c}{21,801} \\
+ Industries & \multicolumn{1}{c}{22} \\
+Years & \multicolumn{1}{c}{1929, 1931, 1933, 1935} \\
+Counties & \multicolumn{1}{c}{2,198}\\
+States & \multicolumn{1}{c}{47} \\
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table}
+
+
+\captionsetup{width=10cm}
+\begin{table}[!htbp] \centering                                                                       
+\caption{Number of Bank Suspensions, 1929-1933}                                                          
+\label{}                                                                                         
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3}  D{.}{.}{-3}   D{.}{.}{-3}  D{.}{.}{-3}  D{.}{.}{-3}  D{.}{.}{-3} } 
+ \\[-1.8ex] Region & \multicolumn{1}{c}{1929} & \multicolumn{1}{c}{1930} & \multicolumn{1}{c}{1931} & \multicolumn{1}{c}{1932} &  \multicolumn{1}{c}{1933}\\
+ \hline \\[-1.8ex] 
+ Central & \multicolumn{1}{c}{554} & \multicolumn{1}{c}{1216} & \multicolumn{1}{c}{910} & \multicolumn{1}{c}{2662} & \multicolumn{1}{c}{40}\\
+ Mountain & \multicolumn{1}{c}{48} & \multicolumn{1}{c}{118} & \multicolumn{1}{c}{188} & \multicolumn{1}{c}{230} & \multicolumn{1}{c}{2}\\
+ Mid-atlantic & \multicolumn{1}{c}{56} & \multicolumn{1}{c}{452} & \multicolumn{1}{c}{118} & \multicolumn{1}{c}{796} & \multicolumn{1}{c}{24}\\
+ New England & \multicolumn{1}{c}{22} & \multicolumn{1}{c}{62} & \multicolumn{1}{c}{18} & \multicolumn{1}{c}{152} & \multicolumn{1}{c}{0}\\
+ Northwestern & \multicolumn{1}{c}{828} & \multicolumn{1}{c}{1434} & \multicolumn{1}{c}{894} & \multicolumn{1}{c}{2262} & \multicolumn{1}{c}{26}\\
+ Pacific & \multicolumn{1}{c}{24} & \multicolumn{1}{c}{106} & \multicolumn{1}{c}{174} & \multicolumn{1}{c}{298} & \multicolumn{1}{c}{0}\\
+ South Atlantic & \multicolumn{1}{c}{402} & \multicolumn{1}{c}{384} & \multicolumn{1}{c}{176} & \multicolumn{1}{c}{506} & \multicolumn{1}{c}{10}\\
+ South Central & \multicolumn{1}{c}{702} & \multicolumn{1}{c}{620} & \multicolumn{1}{c}{378} & \multicolumn{1}{c}{884} & \multicolumn{1}{c}{8}\\
+ \hline \\[-1.8ex]                                                                             
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular}
+\caption*{Data from ICSPR FDIC dataset, before merge with Census dataset. Like \href{https://www0.gsb.columbia.edu/mygsb/faculty/research/pubfiles/5629/calomiris_fundamentals_panics.pdf}{(Calomiris and Mason, 2003)}, regions are so defined: Central includes Ohio, Illinois, Indiana, Michigan, and Wisconsin; Mid-atlantic includes New York, New Jersey, and Pennsylvania; Mountain includes Montana, Idaho, Wyoming, Colorado, New Mexico, Arizona, Utah, and Nevada; New England includes Maine, New Hampshire, Vermont, Massachusetts, Rhode Island, and Connecticut; Northwesten includes Minnesota, Iowa, Missouri, North Dakota, South Dakota, Nebraska, and Kansas; Pacific includes Washington, Oregon, and California; South Atlantic includes Maryland, Delaware, District of Columbia, Virginia, West Virginia, North Carolina, South Carolina, Georgia, and Florida; South Central includes Kentucky, Tennessee, Alabama, Mississippi, Arkansas, Oklahoma, Louisiana, and Texas} 
+\end{table} 
+
+\captionsetup{width=10cm}
+\begin{table}[!htbp] \centering                                                                       
+\caption{Number of Bank Suspensions as Percentage of Total Banks, 1929-1933}                                                          
+\label{}                                                                                         
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3}  D{.}{.}{-3}   D{.}{.}{-3}  D{.}{.}{-3}  D{.}{.}{-3}  D{.}{.}{-3} } 
+ \\[-1.8ex] Region & \multicolumn{1}{c}{1929} & \multicolumn{1}{c}{1930} & \multicolumn{1}{c}{1931} & \multicolumn{1}{c}{1932} &  \multicolumn{1}{c}{1933}\\
+ \hline \\[-1.8ex] 
+ Central & \multicolumn{1}{c}{5.02} & \multicolumn{1}{c}{11.8} & \multicolumn{1}{c}{10.4} & \multicolumn{1}{c}{34.1} & \multicolumn{1}{c}{0.69}\\
+ Mountain & \multicolumn{1}{c}{2.85} & \multicolumn{1}{c}{7.38} & \multicolumn{1}{c}{13.2} & \multicolumn{1}{c}{18.8} & \multicolumn{1}{c}{0.21}\\
+ Mid-atlantic & \multicolumn{1}{c}{0.92} & \multicolumn{1}{c}{7.69} & \multicolumn{1}{c}{2.28} & \multicolumn{1}{c}{16.0} & \multicolumn{1}{c}{0.55}\\
+ New England & \multicolumn{1}{c}{1.73} & \multicolumn{1}{c}{5.08} & \multicolumn{1}{c}{1.62} & \multicolumn{1}{c}{14.2} & \multicolumn{1}{c}{0}\\
+ Northwestern & \multicolumn{1}{c}{6.54} & \multicolumn{1}{c}{12.5} & \multicolumn{1}{c}{9.13} & \multicolumn{1}{c}{25.6} & \multicolumn{1}{c}{0.33}\\
+ Pacific & \multicolumn{1}{c}{1.22} & \multicolumn{1}{c}{5.61} & \multicolumn{1}{c}{10.3} & \multicolumn{1}{c}{20.5} & \multicolumn{1}{c}{0}\\
+ South Atlantic & \multicolumn{1}{c}{9.78} & \multicolumn{1}{c}{10.7} & \multicolumn{1}{c}{5.50} & \multicolumn{1}{c}{16.5} & \multicolumn{1}{c}{0.38}\\
+ South Central & \multicolumn{1}{c}{8.06} & \multicolumn{1}{c}{7.94} & \multicolumn{1}{c}{5.34} & \multicolumn{1}{c}{13.4} & \multicolumn{1}{c}{0.14}\\
+ \hline \\[-1.8ex]                                                                             
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular}
+\caption*{See table 2 for details.} 
+\end{table} 
+
+
+\captionsetup{width=6cm}
+\begin{table} [!htbp] \centering                                                                    
+ \caption{Restrictions on Branch Banking, by State}                                                                           
+ \label{}                                                                                       
+ \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }                        
+ \\[-1.8ex]\hline                                                                                                                                            
+ \\[-1.8ex]  & \multicolumn{1}{c}{1910} & \multicolumn{1}{c}{1929} & \multicolumn{1}{c}{}\\    
+ \hline \\[-1.8ex]                                          
+Alabama & & X \\
+Alaska & & \\
+Arizona & & * \\
+Arkansas & & X \\
+California & * & * \\
+Colorado & X & X \\
+Connecticut & X & X \\
+Delaware & * & *\\
+Florida & * & X \\
+Georgia & * & O \\
+Hawaii & & \\
+Idaho & & X \\
+Illinois & & X \\
+Indiana & & X \\
+Iowa & & X\\
+Kansas & X \\
+Kentucky & & \\
+Louisiana & O & O \\
+Maine & O & O \\
+Maryland & & * \\
+Massachusetts & X & O \\
+Michigan &  & \\
+Minnesotsa & & X \\
+Mississippi & X & O \\
+Missouri & X & X \\
+Montana &  & X \\
+\hline \\[-1.8ex]
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular}
+\caption*{This table reports state branching laws over time. The data is directly from \href{https://www.richmondfed.org/~/media/richmondfedorg/publications/research/economic_review/1990/pdf/er760601.pdf}{(Mengle, 1990)}. \\ X: Only Unit Banking is Allowed; O: State Bank Branching Allowed, but Restrained; *: Branching Permitted Throughout State}
+\end{table} 
+
+\captionsetup{width=6cm}
+\begin{table} [!htbp] \centering                                                                    
+ \caption{Restrictions on Branch Banking, by State (Continued)}                                                                           
+ \label{}                                                                                       
+ \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }                        
+ \\[-1.8ex]\hline                                                                                                                                            
+ \\[-1.8ex]  & \multicolumn{1}{c}{1910} & \multicolumn{1}{c}{1929} & \multicolumn{1}{c}{}\\    
+ \hline \\[-1.8ex]                                          
+Nebraska & & X \\
+Nevada & X & X \\
+New Hampshire &  & \\
+New Jersey & & O \\
+New Mexico & & X \\
+New York & O & O \\
+North Carolina & & * \\
+North Dakota & & \\
+Ohio & & O \\
+Oklahoma & & \\
+Oregon & * & X \\
+Pennsylvania & X & O \\
+Rhode Island & * & * \\
+South Carolina & & * \\
+South Dakota & & \\
+Tennessee & * & O \\
+Texas & X & X \\
+Utah & & X \\
+Vermont & & * \\
+Virginia & & * \\
+Washington & * & X \\
+West Virginia & & X \\
+Wisconsin & X & X \\
+Wyoming & & \\
+\hline \\[-1.8ex]
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular}
+\caption*{This table reports state branching laws over time. The data is directly from \href{https://www.richmondfed.org/~/media/richmondfedorg/publications/research/economic_review/1990/pdf/er760601.pdf}{(Mengle, 1990)}. \\ X: Only Unit Banking is Allowed; O: State Bank Branching Allowed, but Restrained; *: Branching Permitted Throughout State}
+\end{table} 
+
+\captionsetup{width=12.5cm}
+
+  % Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu"
+  % Date and time: Fri, Apr 14, 2017 - 22:26:36                                                            
+  % Requires LaTeX packages: dcolumn                                                                   
+ \begin{table} [!htbp] \centering                                                                    
+ \caption{Fixed Effects}                                                                           
+ \label{}                                                                                       
+ \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }                        
+ \\[-1.8ex]\hline                                                                                     
+ \hline \\[-1.8ex] 
+ \\[-1.8ex] & \multicolumn{3}{c}{ } \\                                                         
+ \\[-1.8ex] log(Labor) & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\    
+ \hline \\[-1.8ex]                                          
+ Post\_1929 x Bank Distress & -0.181^{***} & -0.143^{**} & -0.003 \\ 
+  & (0.050) & (0.061) & (0.050) \\ 
+\hline \\[-1.8ex]
+Year Fixed Effects &  & \multicolumn{1}{c}{X} & \multicolumn{1}{c}{X} \\ 
+County Fixed Effects &  & \multicolumn{1}{c}{X} & \multicolumn{1}{c}{X} \\ 
+Industry Fixed Effects &  &  & \multicolumn{1}{c}{X} \\
+Observations & \multicolumn{1}{c}{34,207} &   \multicolumn{1}{c}{34,207} & \multicolumn{1}{c}{34,207} \\
+R-squared  &   \multicolumn{1}{c}{0.003975} & \multicolumn{1}{c}{0.2561} & \multicolumn{1}{c}{0.6921} \\
+\hline 
+\hline \\[-1.8ex] 
+\textit{Notes:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01}
+\end{tabular}
+\caption*{Table 1 reports the OLS coefficient regression results of log labor every other year from 1929 to 1935 on bank distress, 
+a fixed county characteristic calclulated by dividing the sum of all bank suspensions from 1930 to 1935 in a given county 
+by the total number of banks that were open in that county during 1929. Robust standard errors are clustered at the county level.}
+\end{table} 
+
+
+
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Sat, Apr 15, 2017 - 00:13:49                                                       
+% Requires LaTeX packages: dcolumn
+\captionsetup{width=10cm}                                                                  
+\begin{table}[!htbp] \centering                                                                       
+\caption{Instrumental Variable}                                                                    
+\label{}                                                                                          
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} }                                      
+\\[-1.8ex]\hline
+\hline \\[-1.8ex] 
+\\[-1.8ex]  & \multicolumn{1}{c}{First Stage} & \multicolumn{1}{c}{Second Stage}\\                                     
+\hline \\[-1.8ex]                                                                                   
+Change in Mortgage  & -0.020^{**} &  -2.536^{**}\\                                                                          
+Debt Per Acre, 1920-1910 & (0.008) &  (1.272) \\ 
+\hline \\[-1.8ex]
+Year Fixed Effects & \multicolumn{1}{c}{X} & \multicolumn{1}{c}{X} \\ 
+County Fixed Effects  & \multicolumn{1}{c}{X} & \multicolumn{1}{c}{X} \\ 
+Industry Fixed Effects &  \multicolumn{1}{c}{X} & \multicolumn{1}{c}{X} \\
+Observations &  \multicolumn{1}{c}{14,311} &  \multicolumn{1}{c}{14,311} \\
+R-squared  &   \multicolumn{1}{c}{0.6141} & \multicolumn{1}{c}{0.7812} \\                                                                                                                     
+\hline 
+\hline \\[-1.8ex] 
+\textit{Notes:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\caption*{Column (1) reports the first stage regression results of instrumenting the bank distress fixed county characteristic with change in mortgage debt per acre, from 1920-1910 in a given county. Column (2) reports the regression results of log labor every other year from 1929 to 1935 on instrumented bank distress. Robust standard errors are clustered at the county level. Mortgage debt data from Rajan and Ramcharan (2015).}
+\end{table} 
+                                                                                                       
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu"
+% Date and time: Sat, Apr 15, 2017 - 12:24:07"                                                            
+% Requires LaTeX packages: dcolumn " 
+\captionsetup{width=16.5cm}                                                                     
+\begin{table}[!htbp] \centering                                                                       
+\caption{Dependence on External Finance}                                                          
+\label{}                                                                                         
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+ \\[-1.8ex]\hline  
+ \hline \\[-1.8ex] 
+ \\[-1.8ex] log(Labor) & \multicolumn{1}{c}{(1)} \\
+ \hline \\[-1.8ex]                                                                             
+ High Dependence on External Finance x Bank Distress & -0.276^{***} \\ 
+           & (0.091) \\ 
+  & \\ 
+ Post\_1929 x Bank Distress & -0.038 \\ 
+  & (0.058) \\ 
+  & \\ 
+ High Dependence on External Finance x Post\_1929 x Bank Distress & 0.070 \\ 
+  & (0.108) \\ 
+\hline \\[-1.8ex] 
+Year Fixed Effects & \multicolumn{1}{c}{X} \\ 
+County Fixed Effects  & \multicolumn{1}{c}{X} \\ 
+Industry Fixed Effects &  \multicolumn{1}{c}{X} \\
+Observations & \multicolumn{1}{c}{34,207}  \\
+R-squared  &   \multicolumn{1}{c}{0.6923}  \\
+\hline 
+\hline \\[-1.8ex] 
+\textit{Notes:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\caption*{Table 3 reports fixed effects regression coefficients of log labor for every other year from 1929 to 1935, on the interaction of a high external financial dependence dummy variable with the previous measure of bank distress in tabe 1. Firms in industries with levels of external financial dependence above the industry sample median of 0.04 are categorized as highly dependent on external financing. See table 4 for levels of external financial dependence by industry within the sample. Robust standard errors are clustered at the county level.}
+\end{table} 
+
+\captionsetup{width=10cm}                                                                     
+\begin{table}[!htbp] \centering                                                                       
+\caption{Measure of Dependence on External Finance by Industry}                                                          
+\label{}                                                                                         
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} } 
+ \\[-1.8ex]\hline  
+ \hline \\[-1.8ex] 
+ \\[-1.8ex] \multicolumn{1}{c}{Industry} & \multicolumn{1}{c}{Dependence on External Finance} \\
+  \\[-1.8ex] & \multicolumn{1}{c}{For Mature Companies} \\
+ \hline \\[-1.8ex]                                                                             
+ Automobiles & 0.14 \\  
+ Aviation & 0.23 \\
+ Blast Furnaces & 0.22 \\ 
+ Bone Black & 0.05 \\
+ Cane Sugar & -0.10 \\
+ Cement & 0.15 \\
+ Cigars and Cigarettes & -0.12 \\
+Concrete & 0.15 \\
+Glass & 0.03 \\
+Ice & -0.10 \\
+Ice Cream & -0.10 \\
+Linoleum & 0.10 \\
+Macaroni & -0.10 \\
+Malt & -0.10 \\
+Matches & -0.05 \\
+Petroleum Refining & 0.07 \\
+Radio & 0.39 \\
+Rubber Tires & -0.12 \\
+Soap & -0.05 \\
+Steel Works & 0.07 \\
+Sugar, Refining & -0.07 \\
+Textiles & 0.14 \\
+\hline 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\caption*{Table 4 reports dependence on external finance by industry. Values are from Table A3 of Nanda and Nicholas (2014), which in turn are based on calaulcated values from Rajan and Zingales (1998), for mature companies. When an industry in the sample fell into multiple industry categories from Nanda and Nicholas, the average of those measures was used. Rajan and Zingales define a company's dependence on external finance to be its capital expenditures minus cash generated from operations, divided by total capital expenditures. They calculate the measure for both young and mature firms during the 1980's.}
+\end{table} 
+
+
+%\begin{figure}[h]
+\begin{center}
+\includegraphics[width=1\textwidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Bank Distress Spatial Map".pdf}
+\end{center}
+%\end{figure}[h]
+
+%\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=1\textwidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Average Change in Employment by Industry".pdf}
+\end{center}
+%\end{figure}[ht]
+
+%\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=1\textwidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Average Change in Revenue by Industry".pdf}
+\end{center}
+%\end{figure}[ht]
+
+%\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=1\textwidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Number of Firms per year".pdf}
+\end{center}
+%\end{figure}[ht]
+
+%\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=1\textwidth]{"/Users/Adam/Research/BA_Thesis/Graphs/Bank Distress v External Financial Dependence".pdf}
+\end{center}
+%\end{figure}[ht]
+}
+
+\end{document}
+
+% Table created by stargazer v.5.1 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu"
+% Date and time: Sat, Apr 15, 2017 - 11:01:35                                                    
+% Requires LaTeX packages: dcolumn                                                                  
+%\begin{table}[!htbp] \centering                                                                      
+%\caption{Fixed Effects -- Revenue}                                                        
+%\label{}                                                                                         
+%\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }                        
+% \\[-1.8ex]\hline                                                                                     
+% \hline \\[-1.8ex] 
+% \\[-1.8ex] & \multicolumn{3}{c}{ } \\                                                         
+% \\[-1.8ex] log(Total Value Added) & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\    
+% \hline \\[-1.8ex]                                          
+%Post\_1929 x Bank Distress & -0.228^{***} & -0.124^{**} & -0.022 \\ 
+%  & (0.050) & (0.055) & (0.052) \\ 
+%  & & & \\ 
+%\hline \\[-1.8ex]
+%Observations & 34,207 &   34,207 & 34,207 \\
+%R-squared  &  0.1163  & 0.2504 &  0.3943\\ 
+%\hline 
+%\hline \\[-1.8ex] 
+%\textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+%\end{tabular} 
+%\end{table} 
