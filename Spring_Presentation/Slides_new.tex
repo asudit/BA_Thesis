@@ -1,0 +1,157 @@
+\documentclass[11pt]{beamer}
+\usetheme{CambridgeUS}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx, booktabs}
+
+
+\author{Adam Sudit}
+\title{Bank Distress and Unemployment During the Great Depression:
+A Plant-Level Approach}
+\institute{The University of Chicago} 
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Financial Frictions During Economic Crisis}
+
+\begin{itemize}
+\item Financial crises wreak havoc on the real economy. But through what mechanisms?
+\begin{itemize}
+\item Monetary channels -- Decrease in Supply of Money (Freidman and Schwartz, 1963)
+\item Cost of Credit Intermediation (Bernanke, 1983)
+\item Lending Constraints Negatively Affect Firm Investment and Output (Kashyap et. al, 1993 and Bernanke et. al, 1996)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Disentangling Supply from Demand Effects}
+\begin{itemize}
+\item Do banks supply less credit because they're distressed, or because investment opportunities are poor?
+\begin{itemize}
+\item Use natural experiments to introduce exogenous shocks to credit supply (Ziebarth, 2013; Peek and Rosengren, 2000; Khwaja and Mian, 2008)
+\item Use pre-crisis balance sheet health or lending relationships to proxy financial frictions (Benmelech et. al, 2017; Chodorow-Reich, 2014)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Where We're Going}
+\begin{itemize}
+\item How does restrictions in credit access, as proxied by bank distress, affect employment outcomes in the manufacturing sector? (Adversely)
+\item Do employment effects vary by industry, and if so, why?
+\item Use better dataset to increase identifying variation, and add more industry heterogeneity to sample
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Historical Background}
+\begin{itemize}
+\item Stock market crash on October 1929, but first banking panic on November 1930, followed by another on March 1931
+\item Britain leaves gold standard during September 1931, leading to further deterioration in bank balance sheets
+\item By March 1933, Federal Reserve System suspends open market transactions
+\item Bank holiday declared on March 6, 1933
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Structure of U.S. Banking System}
+\begin{itemize}
+\item Highly fragmented between local, state-chartered banks, and national banks
+\item Interstate and within-state branching was uncommon and often non-existent
+\item Unit banks prevalent
+\end{itemize}
+\end{frame}
+
+\begin{frame}{State Legislation Restricting Bank Branching}
+\begin{table}  \tiny{
+\begin{tabular}{lcc}
+State &1910 & 1929 \\  
+\hline \hline \\
+Alabama & & X \\
+Alaska & & \\
+Arizona & & * \\
+Arkansas & & X \\
+California & * & * \\
+Colorado & X & X \\
+Connecticut & X & X \\
+Delaware & * & *\\
+Florida & * & X \\
+Georgia & * & O \\
+Hawaii & & \\
+Idaho & & X \\
+Illinois & & X \\
+Indiana & & X \\
+Iowa & & X\\
+Kansas & X \\
+Kentucky & & \\
+Louisiana & O & O \\
+Maine & O & O \\
+Maryland & & * \\
+Massachusetts & X & O \\
+Michigan &  & \\
+Minnesotsa & & X \\
+Mississippi & X & O \\
+Missouri & X & X \\
+Montana &  & X \\ 
+\hline                                                                                                                             
+
+\end{tabular}
+}
+\caption{\tiny{X: Only Unit Banking is Allowed; O: State Bank Branching Allowed, but Restrained; *: Branching Permitted Throughout State}}
+\end{table}
+\end{frame}
+
+
+%\begin{frame}{State Legislation Restricting Bank Branching}
+%\begin{figure}
+%\centering{
+%\includegraphics[scale=.325]{"/Users/Adam/Research/BA_Thesis/Spring_Presentation/Bank laws better".pdf}
+%}
+%\end{figure}
+%\end{frame}
+
+\begin{frame}{State Legislation Restricting Bank Branching, Continued}
+\begin{figure}
+\centering{
+\includegraphics[scale=.325]{"/Users/Adam/Research/BA_Thesis/Spring_Presentation/Bank laws 2 better".pdf}
+} 
+\end{figure}
+\end{frame}
+
+\begin{frame}{Why the Historical Background Matters}
+\begin{itemize}
+\item Small, unit banks were an important source of financing to local firms
+\item Bank-specificc sources of distress were often isolated to the regional level, due restrictions on bank branching
+\item Highly relevant to the identification strategy
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Data}
+\begin{itemize}
+\item Manufacturing plant data on the county level, including total value added and labor (Census)
+\item Bank suspensions, total number of banks, and deposits on the county level (FDIC)
+\item Change in Mortgage Debt per Acre, 1920-1910 (Rajan and Ramcharan 2015)
+\item External Finance Dependence, by Industry (Rajan and Zingales, 1998; Nanda and Nicholas, 2014)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Bank Distress}
+\begin{itemize}
+\item Variable of Interest is Bank Distress, a fixed county characteristic:
+\[
+BankDistress_c = \frac{\sum_{t=1930}^{1935} BankSuspensions_{c, t}} {Banks_{c, 1929}}
+\]
+\item FDIC data includes both banks within and outside of the Federal Reserve System, so bank distress measure is complete across the U.S.
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\end{document}
