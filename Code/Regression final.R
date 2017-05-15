@@ -133,6 +133,9 @@ panel_robust <- panel_robust[complete.cases(panel_robust),] #5:6
 
 panel_robust$debt <- as.numeric(panel_robust$debt)
 #mortgage_debt[!is.na(mortgage_debt) & mortgage_debt > 0] <- log(mortgage_debt[!is.na(mortgage_debt) & mortgage_debt > 0])
+panel_robust$debt_acre_1910 <- abs(panel_robust$debt - panel_robust$debt_acre_1920)
+panel_robust$debt_normalized <- panel_robust$debt_acre_1920/panel_robust$debt_acre_1910
+
 
 SLS1 <- lm(post*fixed_char ~ debt + year + county + industry, data = panel_robust, na.action=na.omit)
 summary(SLS1)
@@ -140,6 +143,12 @@ X_hat <- fitted(SLS1)
 SLS2_labor <- lm(labor ~ X_hat + year + county + industry, data = panel_robust, na.action=na.omit)
 
 summary(SLS2_labor)
+
+SLS1_norm <- lm(post*fixed_char ~ debt_normalized + year + county + industry, data = panel_robust, na.action=na.omit)
+summary(SLS1_norm)
+X_hat_norm <- fitted(SLS1_norm)
+SLS2_labor_norm <- lm(labor ~ X_hat_norm + year + county + industry, data = panel_robust, na.action=na.omit)
+summary(SLS2_labor_norm)
 #panel_robust$instrument <- X_hat
 
 #sign doesnt make sense...dont use
@@ -381,3 +390,42 @@ for(i in 1:length(levels(panel$industry)))
 d$coeff <- as.numeric(d$X2)
 ggplot(data =d, aes(x=X3, y=coeff, group=1)) +  geom_point()+ geom_smooth(method='lm')+ xlab("External Financial Dependence") + ylab("Bank Distress Coefficient") + ggtitle("Effects of Bank Distress on Employment v. External Financial Dependence by Industry") 
 
+########################## Summary Statistics #####################
+
+############ banking stats ##################
+fdic_data <- read.xlsx("/Users/Adam/Research/BA_Thesis/Data/FDIC_check.xlsx")
+fdic_data$Year <- as.integer(fdic_data$Year)
+fdic_data <- subset(fdic_data, Year == 1929 |Year == 1930 | Year == 1931 | Year == 1932 |Year == 1933)
+
+central_data <- subset(fdic_data, State == 'ohio' | State == 'illinois' | State =='indiana' | State == 'michigan' | State=='wisconsin')
+mid_atlantic_data <- subset(fdic_data, State == 'new york' | State == 'new jersey' | State =='pennsylvania')
+mountain_data <- subset(fdic_data, State == 'montana' | State == 'idaho' | State =='wyoming' | State == 'colorado' | State=='new mexico' | State=='arizona' | State=='utah'| State=='nevada')
+new_england_data <- subset(fdic_data, State == 'maine' | State == 'new hampshire' | State =='vermont' | State == 'massachusetts' | State=='rhode island' | State=='connecticut')
+northwestern_data <- subset(fdic_data, State == 'minnesota' | State == 'iowa' | State =='missouri' | State == 'north dakota' | State=='south dakota' | State=='nebraska' | State=='kansas')
+pacific_data <- subset(fdic_data, State == 'washington' | State == 'oregon' | State =='california')
+south_atlantic_data <- subset(fdic_data, State == 'maryland' | State == 'delaware' | State =='district of columbia'| State =='virginia'| State =='west virginia' | State =='north carolina'| State =='south carolina'| State =='georgia'| State =='florida')
+south_central_data <- subset(fdic_data, State == 'kentucky' | State == 'tennessee' | State =='alabama' | State =='mississippi' | State =='arkansas'| State =='oklahoma'| State =='louisiana'| State =='texas')
+
+central_data <- unique(central_data[c('State', 'County', 'Year', 'FDIC_BANKS_SUS_','FDIC.DEPOSITS','FDIC_DEPOSITS_SUS_','FDIC.BANKS')])
+mid_atlantic_data <- unique(mid_atlantic_data[c('State', 'County', 'Year', 'FDIC_BANKS_SUS_','FDIC.DEPOSITS','FDIC_DEPOSITS_SUS_','FDIC.BANKS')])
+mountain_data <- unique(mountain_data[c('State', 'County', 'Year', 'FDIC_BANKS_SUS_','FDIC.DEPOSITS','FDIC_DEPOSITS_SUS_','FDIC.BANKS')])
+new_england_data <- unique(new_england_data[c('State', 'County', 'Year', 'FDIC_BANKS_SUS_','FDIC.DEPOSITS','FDIC_DEPOSITS_SUS_','FDIC.BANKS')])
+northwestern_data <- unique(northwestern_data[c('State', 'County', 'Year', 'FDIC_BANKS_SUS_','FDIC.DEPOSITS','FDIC_DEPOSITS_SUS_','FDIC.BANKS')])
+pacific_data <- unique(pacific_data[c('State', 'County', 'Year', 'FDIC_BANKS_SUS_','FDIC.DEPOSITS','FDIC_DEPOSITS_SUS_','FDIC.BANKS')])
+south_atlantic_data <- unique(south_atlantic_data[c('State', 'County', 'Year', 'FDIC_BANKS_SUS_','FDIC.DEPOSITS','FDIC_DEPOSITS_SUS_','FDIC.BANKS')])
+south_central_data <- unique(south_central_data[c('State', 'County', 'Year', 'FDIC_BANKS_SUS_','FDIC.DEPOSITS','FDIC_DEPOSITS_SUS_','FDIC.BANKS')])
+
+
+
+central_data_sum <- data.frame(ddply(central_data, .(Year), summarize,  banks_sus=sum(FDIC_BANKS_SUS_),banks=sum(FDIC.BANKS),deposits_sus=sum(FDIC_DEPOSITS_SUS_),deposits=sum(FDIC.DEPOSITS), bank_percentage=banks_sus/banks, deposits_percentage = deposits_sus/deposits))
+mid_atlantic_data_sum <- data.frame(ddply(mid_atlantic_data, .(Year), summarize,  banks_sus=sum(FDIC_BANKS_SUS_),banks=sum(FDIC.BANKS),deposits_sus=sum(FDIC_DEPOSITS_SUS_),deposits=sum(FDIC.DEPOSITS), bank_percentage=banks_sus/banks, deposits_percentage = deposits_sus/deposits))
+mountain_data_sum <- data.frame(ddply(mountain_data, .(Year), summarize,  banks_sus=sum(FDIC_BANKS_SUS_),banks=sum(FDIC.BANKS),deposits_sus=sum(FDIC_DEPOSITS_SUS_),deposits=sum(FDIC.DEPOSITS), bank_percentage=banks_sus/banks, deposits_percentage = deposits_sus/deposits))
+new_england_sum <- data.frame(ddply(new_england_data, .(Year), summarize, banks_sus=sum(FDIC_BANKS_SUS_),banks=sum(FDIC.BANKS),deposits_sus=sum(FDIC_DEPOSITS_SUS_),deposits=sum(FDIC.DEPOSITS), bank_percentage=banks_sus/banks, deposits_percentage = deposits_sus/deposits))
+northwestern_sum <- data.frame(ddply(northwestern_data, .(Year), summarize,  banks_sus=sum(FDIC_BANKS_SUS_),banks=sum(FDIC.BANKS),deposits_sus=sum(FDIC_DEPOSITS_SUS_),deposits=sum(FDIC.DEPOSITS), bank_percentage=banks_sus/banks, deposits_percentage = deposits_sus/deposits))
+pacific_sum <- data.frame(ddply(pacific_data, .(Year), summarize,  banks_sus=sum(FDIC_BANKS_SUS_),banks=sum(FDIC.BANKS),deposits_sus=sum(FDIC_DEPOSITS_SUS_),deposits=sum(FDIC.DEPOSITS), bank_percentage=banks_sus/banks, deposits_percentage = deposits_sus/deposits))
+south_atlantic_sum <- data.frame(ddply(south_atlantic_data, .(Year), summarize, banks_sus=sum(FDIC_BANKS_SUS_),banks=sum(FDIC.BANKS),deposits_sus=sum(FDIC_DEPOSITS_SUS_),deposits=sum(FDIC.DEPOSITS), bank_percentage=banks_sus/banks, deposits_percentage = deposits_sus/deposits))
+south_central_sum <- data.frame(ddply(south_central_data, .(Year), summarize,  banks_sus=sum(FDIC_BANKS_SUS_),banks=sum(FDIC.BANKS),deposits_sus=sum(FDIC_DEPOSITS_SUS_),deposits=sum(FDIC.DEPOSITS), bank_percentage=banks_sus/banks, deposits_percentage = deposits_sus/deposits))
+
+####################### census stats ########################
+count(unique(panel_original$firm.code))
+count(unique(panel_original[c('County','State')]))
